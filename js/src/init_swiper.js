@@ -12,7 +12,7 @@ export const initSwiper = () => {
         loop: true,
         speed: 1000,
         autoplay: {
-            delay: 5000,
+            delay: 10000,
             disableOnInteraction: false,
             pauseOnMouseEnter: false,
         },
