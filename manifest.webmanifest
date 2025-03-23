@@ -1,0 +1,20 @@
+{
+  "name": "Jellyfin Slideshow",
+  "short_name": "Jellyfin Slideshow",
+  "description": "A slideshow app powered by Jellyfin",
+  "scope": "/",
+  "start_url": "/",
+  "background_color": "#000B25",
+  "theme_color": "#7c5dfa", 
+  "display": "standalone",
+  "display_override": ["fullscreen"],
+  "icons": [
+      {
+        "src": "/static/jellyfin.256x256.png",
+        "type": "image/png",
+        "sizes": "256x256"
+      }
+  ],
+  "manifest_version": 2,
+  "permissions": ["wake-lock"]
+}

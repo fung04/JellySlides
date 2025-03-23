@@ -1,0 +1,193 @@
+/* Reset default padding and margin */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Base styles for HTML and body */
+html, body, #app{
+  height: 100%;
+  overflow: hidden;
+}
+
+body{
+  min-height: calc(100% + env(safe-area-inset-top));
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+.control-buttons {
+  position: absolute;
+  right: 10px;
+  display: flex;
+  gap: 10px;
+  z-index: 100;
+  transition: bottom 0.3s ease;
+  /* Position dynamically based on info panel visibility */
+  bottom: v-bind('showInfoPanel ? "calc(10% + 10px)" : "20px"');
+}
+.control-button {
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.control-button:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* Container for the swiper */
+.swiper-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.swiper-wrapper {
+  display: flex;
+  flex: 1 0 90%; /* This makes it take exactly 90% */
+  width: 100%;
+  min-height: 90%; /* Ensure minimum height is 90% */
+}
+
+/* Individual slides */
+.swiper-slide {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: center; /* Added to better center content */
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+/* Images inside slides */
+.swiper-slide img {
+  flex: 0 0 70%;
+  max-width: 70%;
+  height: 90%;
+  max-height: 80%; /* Limit height to prevent overflow */
+  object-fit: contain;
+  padding: 5px;
+  align-self: center; /* Ensures image is centered vertically */
+}
+
+/* Caption wrapper */
+.caption-wrapper {
+  flex: 1 0 30%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+  min-width: 0; /* Prevent overflow */
+  height: 90%; /* Match height with image */
+}
+
+/* Caption text */
+.swiper-slide-caption {
+  color: #fff;
+  font-family: 'Noto Sans Display', sans-serif;
+  text-align: center;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+  font-weight: bold;
+  width: 100%;
+  margin-bottom: 15px;
+  white-space: nowrap; /* Keeps text in a single line */
+  overflow: hidden; /* Hides overflow */
+  text-overflow: ellipsis; /* Shows ellipsis for overflow */
+  
+  /* Default font size */
+  font-size: 2em;
+  
+  /* Apply font scaling for long text */
+  /* This approach uses CSS calc and clamp for responsive text sizing */
+  /* It will automatically reduce text size based on container width */
+  font-size: clamp(1em, calc(1em + 3vw), 2em);
+}
+
+.swiper-slide-overview {
+  color: #fff;
+  font-size: 0.9em;
+  font-family: 'Noto Sans Display', sans-serif;
+  text-align: left;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+  max-height: 10em; /* Limit to approximately 5 lines of text */
+  overflow-y: auto; /* Enable vertical scrolling */
+  width: 100%;
+  padding-right: 10px; /* Give space for scrollbar */
+  scrollbar-width: thin; /* For Firefox */
+  scrollbar-color: rgba(255,255,255,0.5) transparent; /* For Firefox */
+}
+
+/* Scrollbar styling for WebKit browsers */
+.swiper-slide-overview::-webkit-scrollbar {
+  width: 5px;
+}
+
+.swiper-slide-overview::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.swiper-slide-overview::-webkit-scrollbar-thumb {
+  background-color: rgba(255,255,255,0.5);
+  border-radius: 10px;
+}
+
+/* Info wrapper */
+/* Make the info-wrapper take the other 50% */
+.info-wrapper {
+  display: flex;
+  flex: 1 0 10%; /* This makes it take exactly 10% */
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  padding: 10px 20px;
+  background: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  position: static; /* Changed from relative/absolute */
+  min-height: 10%; /* Ensure minimum height is 10% */
+}
+
+
+/* Responsive Adjustments */
+@media (max-width: 790px) {
+  .swiper-slide {
+    flex-direction: column;
+    align-items: center; /* Center items horizontally */
+    justify-content: center; /* Start from top */
+  }
+  
+  .swiper-slide img {
+    flex: 0 0 auto;
+    max-width: 100%;
+    width: 90%;
+    height: auto; /* Auto height to maintain aspect ratio */
+    max-height: 50%; /* Limit height to prevent overflow */
+    padding-bottom: 0; /* Remove bottom padding */
+    margin-top: 15px; /* Add some space from top */
+    object-position: center; /* Ensure image is centered */
+  }
+  
+  .caption-wrapper {
+    flex: 0 1 auto; /* Don't grow, can shrink, auto basis */
+    width: 90%;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    height: auto;
+    max-height: 40%; /* Limit height on mobile */
+    overflow: visible;
+  }
+  
+  .swiper-slide-overview {
+    max-height: 8em; /* Slightly more space on mobile */
+  }
+}
