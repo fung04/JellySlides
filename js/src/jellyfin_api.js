@@ -217,32 +217,32 @@ class ApiClient {
 
     static async getAllVideoIds() {
         const userId = await ApiClient._getUserId();
-        // const movie = await ApiClient.getVideoIds({ userId, imageType: ImageType.primary, videoType: VideoType.movie });
-        // const series = await ApiClient.getVideoIds({ userId, imageType: ImageType.primary, videoType: VideoType.series });
-        // const boxset = await ApiClient.getVideoIds({ userId, imageType: ImageType.primary, videoType: VideoType.boxset });
-        // const season = await ApiClient.getVideoIds({ userId, imageType: ImageType.primary, videoType: VideoType.season });
+        const movie = await ApiClient.getVideoIds({ userId, imageType: ImageType.primary, videoType: VideoType.movie });
+        const series = await ApiClient.getVideoIds({ userId, imageType: ImageType.primary, videoType: VideoType.series });
+        const boxset = await ApiClient.getVideoIds({ userId, imageType: ImageType.primary, videoType: VideoType.boxset });
+        const season = await ApiClient.getVideoIds({ userId, imageType: ImageType.primary, videoType: VideoType.season });
         const audio = await ApiClient.getVideoIds({ userId, imageType: ImageType.primary, videoType: VideoType.audio });
-        // const movie_backdrop = await ApiClient.getVideoIds({ userId, imageType: ImageType.backdrop, videoType: VideoType.movie });
-        // const series_backdrop = await ApiClient.getVideoIds({ userId, imageType: ImageType.backdrop, videoType: VideoType.series });
-        // const boxset_backdrop = await ApiClient.getVideoIds({ userId, imageType: ImageType.backdrop, videoType: VideoType.boxset });
+        const movie_backdrop = await ApiClient.getVideoIds({ userId, imageType: ImageType.backdrop, videoType: VideoType.movie });
+        const series_backdrop = await ApiClient.getVideoIds({ userId, imageType: ImageType.backdrop, videoType: VideoType.series });
+        const boxset_backdrop = await ApiClient.getVideoIds({ userId, imageType: ImageType.backdrop, videoType: VideoType.boxset });
 
         // show all list length
-        // console.log('movie', movie.length);
-        // console.log('series', series.length);
-        // console.log('boxset', boxset.length);
-        // console.log('season', season.length);
-        // console.log('movie_backdrop', movie_backdrop.length);
-        // console.log('series_backdrop', series_backdrop.length);
-        // console.log('boxset_backdrop', boxset_backdrop.length);
+        console.log('movie', movie.length);
+        console.log('series', series.length);
+        console.log('boxset', boxset.length);
+        console.log('season', season.length);
+        console.log('movie_backdrop', movie_backdrop.length);
+        console.log('series_backdrop', series_backdrop.length);
+        console.log('boxset_backdrop', boxset_backdrop.length);
         console.log('audio', audio.length);
 
-        // const combineList = [...movie, ...series, ...boxset, ...season, ...movie_backdrop, ...series_backdrop, ...boxset_backdrop, ...audio];
-        // console.log('combineList', combineList.length);
-        // combineList.sort(() => Math.random() - 0.5);
-        audio.sort(() => Math.random() - 0.5);
+        const combineList = [...movie, ...series, ...boxset, ...season, ...movie_backdrop, ...series_backdrop, ...boxset_backdrop, ...audio];
+        console.log('combineList', combineList.length);
+        combineList.sort(() => Math.random() - 0.5);
+        // audio.sort(() => Math.random() - 0.5);
         
-        // return combineList;
-        return audio;
+        return combineList;
+        // return audio;
     }
 
 
