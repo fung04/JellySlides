@@ -70,23 +70,25 @@ body{
 
 /* Images inside slides */
 .swiper-slide img {
-  flex: 0 0 70%;
-  max-width: 70%;
+  flex: 2 0; /* Grow and shrink from a basis of 40% */
+  min-width:30%; 
+  max-width: 55%; 
   height: 90%;
-  max-height: 80%; /* Limit height to prevent overflow */
+  max-height: 85%; /* Limit height to prevent overflow */
   object-fit: contain;
-  padding: 5px;
+  padding: 10px;
   align-self: center; /* Ensures image is centered vertically */
 }
 
 /* Caption wrapper */
 .caption-wrapper {
-  flex: 1 0 30%;
+  flex: 1 1; /* Adjust to complement the image */
+  min-width:30%; 
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  padding: 20px;
+  padding: 0px 20px 0px 0;
   min-width: 0; /* Prevent overflow */
   height: 90%; /* Match height with image */
 }
@@ -100,17 +102,7 @@ body{
   font-weight: bold;
   width: 100%;
   margin-bottom: 15px;
-  white-space: nowrap; /* Keeps text in a single line */
-  overflow: hidden; /* Hides overflow */
-  text-overflow: ellipsis; /* Shows ellipsis for overflow */
-  
-  /* Default font size */
-  font-size: 2em;
-  
-  /* Apply font scaling for long text */
-  /* This approach uses CSS calc and clamp for responsive text sizing */
-  /* It will automatically reduce text size based on container width */
-  font-size: clamp(1em, calc(1em + 3vw), 2em);
+  font-size: clamp(1em, 4vw, 1.5em);
 }
 
 .swiper-slide-overview {
@@ -181,7 +173,7 @@ body{
     width: 90%;
     justify-content: center;
     align-items: center;
-    padding: 15px;
+    padding: 0px 10px 0px 10px;
     height: auto;
     max-height: 40%; /* Limit height on mobile */
     overflow: visible;
