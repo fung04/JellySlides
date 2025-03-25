@@ -163,8 +163,7 @@
         };
 
 
-
-        onMounted(() => {
+        onMounted(() => {          
           events.on('login', (data) => {
             sharedState.isLoggedIn = true;
             nextTick(() => {

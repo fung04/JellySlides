@@ -94,11 +94,8 @@ export const authenticate = async () => {
         localStorage.setItem('apiConstant', JSON.stringify(apiConstantsJson));
         localStorage.setItem('deviceId', deviceId.value);
 
-        sharedState.isLoggedIn = true;
-        sharedState.isLoggingIn = false;
-
         // Initialize Swiper and WebSocket after login
-        events.emit('login');
+        
         // nextTick(() => {
 
         //     // initSwiper();
@@ -107,9 +104,14 @@ export const authenticate = async () => {
     } catch (error) {
         console.error('Authentication failed:', error);
         alert('Login failed. Please check your username and password.');
+        
         sharedState.isLoggingIn = false;
         events.emit('logout');
 
+    }finally {
+        sharedState.isLoggedIn = true;
+        sharedState.isLoggingIn = false;
+        events.emit('login');
     }
 };
 
