@@ -10,9 +10,14 @@
   "display_override": ["fullscreen"],
   "icons": [
       {
-        "src": "/static/jellyfin.256x256.png",
+        "src": "/static/256x256.png",
         "type": "image/png",
         "sizes": "256x256"
+      },
+      {
+        "src": "/static/512x512.png",
+        "type": "image/png",
+        "sizes": "512x512"
       }
   ],
   "manifest_version": 2,
