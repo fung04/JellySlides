@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
   <link rel="stylesheet" href="css/slideshow_swiper.css">
   <link rel="stylesheet" href="css/slideshow_component.css">
-  <link rel="stylesheet" href="css/slideshow_login.css" v-if="!isLoggedIn">
+  <link rel="stylesheet" href="css/slideshow_login.css" v-if="!sharedState.isLoggedIn">
   <style>
     .fade-enter-active,
     .fade-leave-active {
@@ -53,7 +53,7 @@
 <body>
   <div id="app">
     <transition name="fade">
-      <div class="login-container" v-if="!isLoggedIn">
+      <div class="login-container" v-if="!sharedState.isLoggedIn">
         <div class="login-header">
           <!-- <img src="https://jellyfin.org/images/logo.svg" alt="Jellyfin Logo" class="jellyfin-logo"> -->
           <h1>Jellyfin Slideshow</h1>
@@ -73,8 +73,8 @@
             <input type="password" id="password" v-model="Password" placeholder="Enter your password"
               autocomplete="current-password" required />
           </div>
-          <button type="submit" class="login-button" :class="{ 'button-loading': isLoggingIn }">
-            {{ isLoggingIn ? 'Signing in...' : 'Sign In' }}
+          <button type="submit" class="login-button" :class="{ 'button-loading': sharedState.isLoggingIn }">
+            {{ sharedState.isLoggingIn ? 'Signing in...' : 'Sign In' }}
           </button>
         </form>
       </div>
@@ -82,7 +82,7 @@
 
     <!-- Swiper Container -->
     <transition name="fade">
-      <div class="swiper-container" v-if="isLoggedIn">
+      <div class="swiper-container" v-if="sharedState.isLoggedIn">
         <div class="swiper-wrapper">
           <div class="swiper-slide">
             <div class="caption-wrapper">
@@ -101,17 +101,17 @@
             <div class="swiper-lazy-preloader"></div>
           </div>
         </div>
-        <div class="loading-spinner" v-show="!isSwiperInitialized" ></div>
+        <div class="loading-spinner" v-show="!sharedState.isSwiperInitialized" ></div>
         <!-- <button id="fullscreenToggle">⛶</button> -->
         <!-- <button id="logoutButton" @click="logout">Logout</button> -->
-        <div class="control-buttons" :style="{ bottom: showInfoPanel ? 'calc(10% + 10px)' : '20px' }" v-show="isSwiperInitialized">
+        <div class="control-buttons" :style="{ bottom: sharedState.showInfoPanel ? 'calc(10% + 10px)' : '20px' }" v-show="sharedState.isSwiperInitialized">
           <button class="control-button" @click="toggleInfoPanel">
-            {{ showInfoPanel ? 'Hide Info' : 'Show Info' }}
+            {{ sharedState.showInfoPanel ? 'Hide Info' : 'Show Info' }}
           </button>
           <button class="control-button" @click="logout">Logout</button>
         </div>
         <transition name="fade">
-          <div class="info-wrapper" v-show="isSwiperInitialized && showInfoPanel">
+          <div class="info-wrapper" v-show="sharedState.isSwiperInitialized && sharedState.showInfoPanel">
             <div class="info-text">Press <strong>→</strong> to navigate</div>
             <div class="info-text">Press <strong>ESC</strong> to exit fullscreen</div>
           </div>
@@ -130,9 +130,10 @@
 
   <script type="module">
     import { events, login, logout, generateDeviceId, fetchSystemInfo, authenticate } from './js/src/init_login.js';
-    import { baseUrl, port, UserName, Password, isLoggedIn, isLoggingIn } from './js/src/init_login.js';
-    import { isSwiperInitialized, swiper, initSwiper } from './js/src/init_swiper.js';
+    import { baseUrl, port, UserName, Password } from './js/src/init_login.js';
+    import { swiper, initSwiper } from './js/src/init_swiper.js';
     import { wsClient, initWebSocket } from './js/src/init_websocket.js';
+    import { sharedState } from './js/src/shared-state.js';
 
     import { createApp, ref, reactive, onMounted, onUnmounted, nextTick, watch } from './js/lib/vue.esm-browser.min.js';
     import axios from "./js/lib/axios.js";
@@ -141,10 +142,10 @@
 
     const app = createApp({
       setup() {
-        const showInfoPanel = ref(true);
+        // const showInfoPanel = ref(true);
     
         const toggleInfoPanel = () => {
-          showInfoPanel.value = !showInfoPanel.value;
+          sharedState.showInfoPanel = !sharedState.showInfoPanel;
         };
 
         const resetState = () => {
@@ -153,8 +154,8 @@
           localStorage.removeItem('requestHeaders');
           localStorage.removeItem('deviceId');
 
-          isLoggedIn.value = false;
-          isSwiperInitialized.value = false;
+          sharedState.isLoggedIn = false;
+          sharedState.isSwiperInitialized = false;
 
           if (swiper.value) {
             swiper.value.autoplay.stop();
@@ -165,10 +166,10 @@
 
         onMounted(() => {
           events.on('login', (data) => {
-            isLoggedIn.value = true;
+            sharedState.isLoggedIn = true;
             nextTick(() => {
-              initSwiper(showInfoPanel);
-              if (isSwiperInitialized) {
+              initSwiper();
+              if (sharedState.isSwiperInitialized) {
                 initWebSocket();
               }
             });
@@ -181,10 +182,10 @@
 
           const autheticateInfo = localStorage.getItem('autheticateInfo');
           if (autheticateInfo) {
-            isLoggedIn.value = true;
+            sharedState.isLoggedIn = true;
             nextTick(() => {
-              initSwiper(showInfoPanel);
-              if (isSwiperInitialized) {
+              initSwiper();
+              if (sharedState.isSwiperInitialized) {
                 initWebSocket();
               }
             });
@@ -202,14 +203,11 @@
           port,
           UserName,
           Password,
-          isLoggedIn,
-          isLoggingIn,
           swiper,
-          isSwiperInitialized,
           login,
           logout,
-          showInfoPanel,
           toggleInfoPanel,
+          sharedState,
         };
       },
     });

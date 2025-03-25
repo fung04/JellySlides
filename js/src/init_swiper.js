@@ -1,6 +1,7 @@
 import { ref } from '../lib/vue.esm-browser.min.js';
+import { sharedState } from './shared-state.js'
 
-export const isSwiperInitialized = ref(null);
+// export const isSwiperInitialized = ref(null);
 export const swiper = ref(null);
 
 export const initSwiper = () => {
@@ -226,7 +227,7 @@ export const initSwiper = () => {
             await preloadImages(2, PRELOAD_COUNT - 2);
 
             // Start autoplay and update UI
-            isSwiperInitialized.value = true;
+            sharedState.isSwiperInitialized = true;
             currentIndex = 2; // Next index to load
 
         } catch (error) {
@@ -300,11 +301,13 @@ export const initSwiper = () => {
         const container = domElements.swiperContainer;
 
         if (!document.fullscreenElement) {
+            sharedState.showInfoPanel = false;
             container.requestFullscreen().catch(err => {
                 console.log(`Error attempting to enable fullscreen: ${err.message}`);
             });
         } else {
             document.exitFullscreen();
+            sharedState.showInfoPanel = true;
         }
 
     });
@@ -400,7 +403,7 @@ export const initSwiper = () => {
         window.videoIds = undefined;
 
         // Signal that cleanup is complete
-        isSwiperInitialized.value = false;
+        sharedState.isSwiperInitialized = false;
         console.log('Swiper resources cleaned up');
     };
 

@@ -1,6 +1,6 @@
 import { ref, nextTick } from '../lib/vue.esm-browser.min.js';
-import { swiper, isSwiperInitialized } from '../src/init_swiper.js';
-
+import { sharedState } from './shared-state.js'
+import { swiper } from '../src/init_swiper.js';
 
 export const wsClient = ref(null);
 
@@ -24,13 +24,9 @@ export const initWebSocket = () => {
         protocol: apiConstants.protocol || 'wss',
         port: apiConstants.port || 443,
 
-
-
         // Add these at the component level (outside the handler)
-
-
         onMessage: (message) => {
-            if (isSwiperInitialized.value === true) {
+            if (sharedState.isSwiperInitialized === true) {
                 
                 if (message.MessageType === 'Sessions') {
                     // const firstData = message.Data[0];
@@ -177,6 +173,7 @@ export const initWebSocket = () => {
                 wsClient.value.sendMessage("SessionsStart", "0, 1500");
                 wsClient.value.sendMessage("ActivityLogEntryStart", "0, 1000");
             }, 500);
+            sharedState.isWebSocketInitialized = true;
         },
         onError: (error) => {
             console.error('WebSocket error:', error);
@@ -186,7 +183,7 @@ export const initWebSocket = () => {
         },
         onUnexpectedClose: () => {
             setTimeout(() => {
-                if (isLoggedIn.value) {
+                if (sharedState.isLoggedIn) {
                     initWebSocket();
                 }
             }, 5000);

@@ -1,4 +1,5 @@
 import { ref } from '../lib/vue.esm-browser.min.js';
+import { sharedState } from './shared-state.js'
 import axios from "../lib/axios.js";
 
 export const baseUrl = ref(null);
@@ -11,8 +12,6 @@ export const deviceName = ref('MyDevice');
 export const deviceId = ref(null);
 export const applicationVersion = ref(null);
 export const accessToken = ref(null);
-export const isLoggedIn = ref(false);
-export const isLoggingIn = ref(false);
 
 export const generateDeviceId = () => {
     const userAgent = navigator.userAgent;
@@ -29,11 +28,11 @@ export const fetchSystemInfo = async () => {
     } catch (error) {
         console.error('Failed to fetch system info:', error);
         alert('Could not connect to the server. Please check the address and try again.');
-        isLoggingIn.value = false;
+        sharedState.isLoggingIn = false;
     }
 };
 
-export const  parseServerUrl = async (url) => {
+export const parseServerUrl = async (url) => {
     // Initialize default values
     // let protocol = 'https';
     // let host = '';
@@ -68,8 +67,6 @@ export const authenticate = async () => {
     };
 
     try {
-
-
         const response = await axios.post(
             `${protocol.value}://${baseUrl.value}:${port.value}/Users/authenticatebyname`,
             {
@@ -97,8 +94,8 @@ export const authenticate = async () => {
         localStorage.setItem('apiConstant', JSON.stringify(apiConstantsJson));
         localStorage.setItem('deviceId', deviceId.value);
 
-        isLoggedIn.value = true;
-        isLoggingIn.value = false;
+        sharedState.isLoggedIn = true;
+        sharedState.isLoggingIn = false;
 
         // Initialize Swiper and WebSocket after login
         events.emit('login');
@@ -110,14 +107,14 @@ export const authenticate = async () => {
     } catch (error) {
         console.error('Authentication failed:', error);
         alert('Login failed. Please check your username and password.');
-        isLoggingIn.value = false;
+        sharedState.isLoggingIn = false;
         events.emit('logout');
 
     }
 };
 
 export const login = async () => {
-    isLoggingIn.value = true;
+    sharedState.isLoggingIn = true;
     await parseServerUrl(baseUrl.value);
     await fetchSystemInfo();
     await authenticate();
