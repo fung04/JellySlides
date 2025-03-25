@@ -309,6 +309,13 @@ export const initSwiper = () => {
 
     });
 
+    swiper.value.on("resize",() =>{
+        swiper.value.update();
+        if (swiper.value.autoplay.paused) {
+            swiper.value.autoplay.resume();
+        }
+    });
+
     // Initialize event for better cleanup
     swiper.value.on('init', () => {
         // Request wake lock to keep screen on
