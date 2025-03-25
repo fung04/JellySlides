@@ -167,7 +167,7 @@
           events.on('login', (data) => {
             isLoggedIn.value = true;
             nextTick(() => {
-              initSwiper();
+              initSwiper(showInfoPanel);
               if (isSwiperInitialized) {
                 initWebSocket();
               }
@@ -183,7 +183,7 @@
           if (autheticateInfo) {
             isLoggedIn.value = true;
             nextTick(() => {
-              initSwiper();
+              initSwiper(showInfoPanel);
               if (isSwiperInitialized) {
                 initWebSocket();
               }
