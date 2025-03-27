@@ -17,6 +17,10 @@
   <link rel="stylesheet" href="css/slideshow_component.css">
   <link rel="stylesheet" href="css/slideshow_login.css" v-if="!sharedState.isLoggedIn">
   <style>
+    [v-cloak] {
+      display: none;
+    }
+
     .fade-enter-active,
     .fade-leave-active {
       transition: opacity 0.3s cubic-bezier(0.4, 0.0, 0.2, 1),
@@ -38,21 +42,21 @@
   <link rel="manifest" href="/manifest.webmanifest">
   <script>
     if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function () {
-            navigator.serviceWorker.register('service-worker.js', {scope: '/'}).then(function (registration) {
-                console.log('ServiceWorker registration successful with scope: ', registration.scope);
-            }, function (err) {
-                alert('ServiceWorker registration failed: ');
-                console.log('ServiceWorker registration failed: ', err);
-            });
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('service-worker.js', { scope: '/' }).then(function (registration) {
+          console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        }, function (err) {
+          alert('ServiceWorker registration failed: ');
+          console.log('ServiceWorker registration failed: ', err);
         });
+      });
     }
   </script>
 </head>
 
 <body>
   <div id="app">
-    <transition name="fade">
+    <transition name="fade" v-cloak>
       <div class="login-container" v-if="!sharedState.isLoggedIn">
         <div class="login-header">
           <!-- <img src="https://jellyfin.org/images/logo.svg" alt="Jellyfin Logo" class="jellyfin-logo"> -->
@@ -81,7 +85,7 @@
     </transition>
 
     <!-- Swiper Container -->
-    <transition name="fade">
+    <transition name="fade" v-cloak>
       <div class="swiper-container" v-if="sharedState.isLoggedIn">
         <div class="swiper-wrapper">
           <div class="swiper-slide">
@@ -101,10 +105,11 @@
             <div class="swiper-lazy-preloader"></div>
           </div>
         </div>
-        <div class="loading-spinner" v-show="!sharedState.isSwiperInitialized" ></div>
+        <div class="loading-spinner" v-show="!sharedState.isSwiperInitialized"></div>
         <!-- <button id="fullscreenToggle">⛶</button> -->
         <!-- <button id="logoutButton" @click="logout">Logout</button> -->
-        <div class="control-buttons" :style="{ bottom: sharedState.showInfoPanel ? 'calc(10% + 10px)' : '20px' }" v-show="sharedState.isSwiperInitialized">
+        <div class="control-buttons" :style="{ bottom: sharedState.showInfoPanel ? 'calc(10% + 10px)' : '20px' }"
+          v-show="sharedState.isSwiperInitialized">
           <button class="control-button" @click="toggleInfoPanel">
             {{ sharedState.showInfoPanel ? 'Hide Info' : 'Show Info' }}
           </button>
@@ -117,17 +122,9 @@
           </div>
         </transition>
       </div>
-      </div>
-    </transition>
   </div>
-
-  <script src="js/src/jellyfin_websocket.js"></script>
-  <script src="js/src/jellyfin_api.js"></script>
-  <script src="js/lib/blurhash_pure_js_port.min.js"></script>
-  <script src="js/src/wake_lock.js"></script>
-  <script src="js/src/apply_background_blurhash.js"></script>
-  <!-- <script src="js/adjust_caption.js"></script> -->
-
+  </transition>
+  </div>
   <script type="module">
     import { events, login, logout, generateDeviceId, fetchSystemInfo, authenticate } from './js/src/init_login.js';
     import { baseUrl, port, UserName, Password } from './js/src/init_login.js';
@@ -138,12 +135,12 @@
     import { createApp, ref, reactive, onMounted, onUnmounted, nextTick, watch } from './js/lib/vue.esm-browser.min.js';
     import axios from "./js/lib/axios.js";
 
-    
+
 
     const app = createApp({
       setup() {
         // const showInfoPanel = ref(true);
-    
+
         const toggleInfoPanel = () => {
           sharedState.showInfoPanel = !sharedState.showInfoPanel;
         };
@@ -163,7 +160,7 @@
         };
 
 
-        onMounted(() => {          
+        onMounted(() => {
           events.on('login', (data) => {
             sharedState.isLoggedIn = true;
             nextTick(() => {
@@ -213,6 +210,12 @@
 
     app.mount('#app');
   </script>
+  <script src="js/src/jellyfin_websocket.js"></script>
+  <script src="js/src/jellyfin_api.js"></script>
+  <script src="js/lib/blurhash_pure_js_port.min.js"></script>
+  <script src="js/src/wake_lock.js"></script>
+  <script src="js/src/apply_background_blurhash.js"></script>
+  <!-- <script src="js/adjust_caption.js"></script> -->
 </body>
 
 </html>
