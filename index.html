@@ -165,9 +165,7 @@
             sharedState.isLoggedIn = true;
             nextTick(() => {
               initSwiper();
-              if (sharedState.isSwiperInitialized) {
-                initWebSocket();
-              }
+              initWebSocket();
             });
 
           });
@@ -181,9 +179,7 @@
             sharedState.isLoggedIn = true;
             nextTick(() => {
               initSwiper();
-              if (sharedState.isSwiperInitialized) {
-                initWebSocket();
-              }
+              initWebSocket();
             });
           }
         });

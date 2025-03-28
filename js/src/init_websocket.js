@@ -3,13 +3,14 @@ import { sharedState } from './shared-state.js'
 import { swiper } from '../src/init_swiper.js';
 
 export const wsClient = ref(null);
+export const firstData = ref(null);
+export const previousDeviceId = ref(null);
+export const previousMediaId = ref(null);
 
 export const initWebSocket = () => {
     const apiConstants = JSON.parse(localStorage.getItem('apiConstant') || '{}');
     const deviceId = localStorage.getItem('deviceId');
-    let previousMediaId = null;
-    let previousDeviceId = null;
-    let firstData = null;
+
 
 
     if (!apiConstants.apiKey || !apiConstants.baseUrl || !deviceId) {
@@ -23,150 +24,15 @@ export const initWebSocket = () => {
         deviceId: deviceId,
         protocol: apiConstants.protocol || 'wss',
         port: apiConstants.port || 443,
-
-        // Add these at the component level (outside the handler)
+        
         onMessage: (message) => {
             if (sharedState.isSwiperInitialized === true) {
-                
+
                 if (message.MessageType === 'Sessions') {
-                    // const firstData = message.Data[0];
-                    // First, try to find an item with the same device ID as previous
-                    if (previousDeviceId) {
-                        for (const data of message.Data) {
-                            if (data.DeviceId === previousDeviceId) {
-                                console.log(`Found match with previous device ID ${previousDeviceId}`);
-                                firstData = data;
-                                break; // Found a match with the previous device ID and not paused
-                            }
-                            else {
-                                firstData = null; // Where stop playing
-                                previousDeviceId = null; // Reset previousDeviceId
-                            }
-                        }
-                    }
-                    // If no match found with previous device ID, take the first item with PlayState not paused
-                    else if (!firstData) {
-                        for (const data of message.Data) {
-                            if (data?.PlayState && data.PlayState.IsPaused === false && data.NowPlayingItem) {
-                                swiper.value.autoplay.stop();
-
-                                firstData = data;
-                                console.log(data)
-                                previousDeviceId = data.DeviceId; // Update the previousDeviceId
-                                break;
-                            }
-                            else {
-                                // firstData = null; // Where stop playing
-                                previousDeviceId = null; // Reset previousDeviceId
-
-                            }   
-                        }
-                    }
-
-                    // Check if we have position data and a valid PlayState
-                    if (firstData?.PlayState) {
-                        const isPlaying = firstData.PlayState.IsPaused === false;
-                        const MediaInfo = firstData.NowPlayingItem || {};
-                        const nowPlayingName = MediaInfo.Name || "Unknown Track";
-
-                        nextTick(() => {
-                            
-                            // Determine if Media has changed
-                            const MediaChanged = MediaInfo.Id && previousMediaId  !== MediaInfo.Id;
-                            
-                            // Log the current state for debugging
-                            console.log(`State: ${MediaChanged ? 'New Media' : 'Same Media'}, Playing: ${isPlaying ? 'Yes' : 'No'}, Previous ID: ${previousMediaId || 'None'}`);
-                            
-                            if (MediaChanged) {
-                                
-                                if (isPlaying) {
-                                    // Get the current autoplay time left
-                                    const timeLeft = swiper.value.autoplay.timeLeft;
-                                    console.log("Current autoplay time left:", timeLeft);
-                                    
-                                    // If time left is less than 2000ms (2 seconds), wait before proceeding
-                                    if (timeLeft && timeLeft < 2000) {
-                                        console.log("Time left less than 2 seconds, waiting...");
-                                        // Use setTimeout to delay the transition
-                                        setTimeout(() => {
-                                            performTransition();
-                                        }, 2000);
-                                    } else {
-                                        // Proceed immediately with the transition
-                                        performTransition();
-                                    }
-                                    
-                                    function performTransition() {
-                                        swiper.value.autoplay.stop();
-                                        previousMediaId = MediaInfo.Id;
-                                        const nextSlideIndex = swiper.value.previousIndex;
-                                        const nextSlide = swiper.value.slides[nextSlideIndex];
-                                        const nextSlideCaption = nextSlide.querySelector('.swiper-slide-caption');
-                                        const nextSlideOverview = nextSlide.querySelector('.swiper-slide-overview');
-                                        const nextSlideImage = nextSlide.querySelector('img');
-                                        
-                                        // Fetch and apply the image
-                                        ApiClient.getImageUrl(MediaInfo.Id)
-                                            .then(async result => {
-                                                console.log(result);
-                                                const blurhashValue = Object.values(result.blurhashId)[0];
-                                                await applyBackgroundBlurhash(blurhashValue, nextSlide);
-                                                nextSlideImage.src = result.imageUrl;
-                                            }).catch(error => {
-                                                console.error('Error fetching image URL:', error.message);
-                                                // Fallback to the placeholder image if there's an error
-                                                nextSlideImage.src = 'https://plchldr.co/i/500x500?&bg=1111&fc=ffff';
-                                            });
-                                            
-                                        nextSlideCaption.innerHTML = nowPlayingName;
-                                        nextSlideOverview.innerHTML = MediaInfo.Album || "Now Playing";
-                                        
-                                        console.log(`Current index ${swiper.value.activeIndex}, Slide to index ${nextSlideIndex}`);
-                                        
-                                        if (swiper.value.activeIndex !== nextSlideIndex) {
-                                            swiper.value.slideNext();
-                                        }
-                                        
-                                        console.log("⏭️ Media changed - updating slide and advancing and stop autoplay");
-                                        swiper.value.autoplay.stop();
-                                    }
-                                }
-                                else if (!isPlaying)
-                                {
-                                    if (!swiper.value.autoplay.running) {
-                                        previousMediaId = null
-                                        firstData = null
-
-                                        console.log("⏸️ Media Pause - staring autoplay")
-                                        swiper.value.autoplay.start();
-
-                                    }
-                                }
-                            } 
-                            else if (!MediaChanged) {
-
-                                if (!isPlaying)
-                                {
-                                    if (!swiper.value.autoplay.running) {
-                                        previousMediaId = null
-                                        firstData = null
-                                        
-                                        console.log("⏸️ Current Media Pause - staring autoplay")
-                                        console.log(`Current index ${swiper.value.realIndex}, Slide to index ${(swiper.value.activeIndex + 1) % swiper.value.slides.length}`)
-
-                                        swiper.value.autoplay.start();
-                                    }
-                                }
-
-                            }
-
-                        });
-                            
-                    }
+                    processMessageData(message);
                 }
             }
         },
-
         onConnect: () => {
             wsClient.value.sendMessage("KeepAlive");
             setTimeout(() => {
@@ -192,3 +58,124 @@ export const initWebSocket = () => {
 
     wsClient.value.connect();
 };
+
+export const processMessageData = (message) => {
+  // Function to safely access properties, avoids errors if an object is missing
+  const safeAccess = (obj, ...keys) => {
+    if (!obj) return undefined;
+    return keys.reduce((acc, key) => (acc && typeof acc === 'object' ? acc[key] : undefined), obj);
+  };
+
+    if (!message || !message.Data || !Array.isArray(message.Data)) {
+        console.warn("Invalid message data received:", message);
+        return;  // Early exit for invalid data
+    }
+
+    // 1. Find item with the same device ID (if applicable)
+    if (previousDeviceId.value) {
+        for (const data of message.Data) {
+            if (data.DeviceId === previousDeviceId.value) {
+                console.log(`Found match with previous device ID ${previousDeviceId.value}`);
+                firstData.value = data;
+                break; // Exit the loop; match found
+            }
+        }
+    }
+
+    // 2. If no device ID match, find a playing item
+    if (!firstData.value) {
+        for (const data of message.Data) {
+            if (safeAccess(data, 'PlayState', 'IsPaused') === false && data.NowPlayingItem) {
+                console.log("Found a playing item", data);
+                firstData.value = data;
+                previousDeviceId.value = data.DeviceId;
+                break; // Exit the loop; playing item found
+            }
+        }
+    }
+
+    // 3. No valid data found in the message
+    if (!firstData.value) {
+      console.warn("No valid playing item found in the message.");
+      previousDeviceId.value = null;
+      return; // Exit the function, no action needed.
+    }
+
+    // 4. Media State Handling
+    if (firstData.value?.PlayState) {
+        const isPlaying = firstData.value.PlayState.IsPaused === false;
+        const MediaInfo = firstData.value.NowPlayingItem || {}; // Default to empty object
+        const nowPlayingName = MediaInfo.Name || "Unknown Track";
+        const mediaId = MediaInfo.Id;
+        const MediaChanged = mediaId && previousMediaId.value !== mediaId;
+
+        console.log(`State: ${MediaChanged ? 'New Media' : 'Same Media'}, Playing: ${isPlaying ? 'Yes' : 'No'}, Previous ID: ${previousMediaId.value || 'None'}`);
+
+        if (MediaChanged) {
+
+            if (isPlaying) {
+                const delay = swiper.value.autoplay.timeLeft < 2000 ? swiper.value.autoplay.timeLeft + 500 : 0;
+                setTimeout(() => (performTransition(nowPlayingName, MediaInfo)), delay);
+            }
+            else if (!isPlaying) {
+
+                // Media is paused
+                if (!swiper.value.autoplay.running) {
+                    console.log("⏸️ Media Paused - starting autoplay");
+                    swiper.value.autoplay.start();
+                }
+
+                previousMediaId.value = null; // Reset previousMediaId.value when going to pause state
+                previousDeviceId.value = null; // Reset previousDeviceId.value when going to pause state
+                firstData.value = null; // Reset firstData.value when going to pause state
+            }
+        }
+        else if (!MediaChanged) {
+
+            if (!isPlaying) {
+                // Media is paused and no change in media detected
+                if (!swiper.value.autoplay.running) {
+                    console.log("⏸️ Media Paused - starting autoplay");
+                    swiper.value.autoplay.start();
+                }
+
+                previousMediaId.value = null; // Reset previousMediaId.value when going to pause state
+                previousDeviceId.value = null; // Reset previousDeviceId.value when going to pause state
+                firstData.value = null; // Reset firstData.value when going to pause state
+            }
+        }
+            
+    } else {
+        console.warn("firstData.PlayState is not present:", firstData);
+    }
+
+    // --- Local Function: performTransition within processMessageData ---
+    async function performTransition(nowPlayingName, MediaInfo) {
+        previousMediaId.value = MediaInfo.Id;
+        const nextSlideIndex = swiper.value.previousIndex;
+        const nextSlide = swiper.value.slides[nextSlideIndex];
+        const nextSlideCaption = nextSlide.querySelector('.swiper-slide-caption');
+        const nextSlideOverview = nextSlide.querySelector('.swiper-slide-overview');
+        const nextSlideImage = nextSlide.querySelector('img');
+
+        try {
+                const result = await ApiClient.getImageUrl(MediaInfo.Id);
+                const blurhashValue = Object.values(result.blurhashId)[0];
+                await applyBackgroundBlurhash(blurhashValue, nextSlide);
+                nextSlideImage.src = result.imageUrl;
+            } catch (error) {
+                console.error('Error fetching image URL:', error.message);
+                nextSlideImage.src = 'https://plchldr.co/i/500x500?&bg=1111&fc=ffff'; // Fallback
+            }
+
+        nextSlideCaption.innerHTML = nowPlayingName;
+        nextSlideOverview.innerHTML = MediaInfo.Album || "Now Playing";
+        console.log(`Current index ${swiper.value.activeIndex}, Slide to index ${nextSlideIndex}`);
+        if (swiper.value.activeIndex !== nextSlideIndex) {
+            swiper.value.slideTo(nextSlideIndex); // Use slideTo for direct transition
+        }
+
+        console.log("⏭️ Media changed - updating slide and advancing and stop autoplay");
+        swiper.value.autoplay.stop()
+    }
+}
