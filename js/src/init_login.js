@@ -101,6 +101,9 @@ export const authenticate = async () => {
         //     // initSwiper();
         //     // initWebSocket();
         // });
+        sharedState.isLoggedIn = true;
+        sharedState.isLoggingIn = false;
+        events.emit('login');
     } catch (error) {
         console.error('Authentication failed:', error);
         alert('Login failed. Please check your username and password.');
@@ -108,10 +111,6 @@ export const authenticate = async () => {
         sharedState.isLoggingIn = false;
         events.emit('logout');
 
-    }finally {
-        sharedState.isLoggedIn = true;
-        sharedState.isLoggingIn = false;
-        events.emit('login');
     }
 };
 
