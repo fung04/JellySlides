@@ -116,10 +116,9 @@
           <button class="control-button" @click="logout">Logout</button>
         </div>
         <transition name="fade">
-          <div class="info-wrapper" v-show="sharedState.isSwiperInitialized && sharedState.showInfoPanel">
-            <div class="info-text">Press <strong>→</strong> to navigate</div>
-            <div class="info-text">Press <strong>ESC</strong> to exit fullscreen</div>
-          </div>
+        <div class="info-wrapper" v-show="sharedState.isSwiperInitialized && sharedState.showInfoPanel">
+          <div id="clock-date" v-text="currentTime"></div>
+        </div>
         </transition>
       </div>
   </div>
@@ -160,6 +159,18 @@
         };
 
 
+        // Reactive state for current time
+        const currentTime = ref('');
+
+        // Function to update the current time
+        const updateTime = () => {
+          const now = new Date();
+          const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour12: false};
+          currentTime.value = now.toLocaleTimeString('en-GB', options);
+        };
+        const updateTimeInterval = setInterval(updateTime, 1000);
+
+
         onMounted(() => {
           events.on('login', (data) => {
             sharedState.isLoggedIn = true;
@@ -185,7 +196,7 @@
         });
 
         onUnmounted(() => {
-
+          clearInterval(updateTimeInterval);
           // resetState();
         });
 
@@ -200,6 +211,7 @@
           logout,
           toggleInfoPanel,
           sharedState,
+          currentTime
         };
       },
     });
