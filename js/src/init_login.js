@@ -139,7 +139,7 @@ export const logout = async () => {
         };
 
         await axios.post(
-            `${protocol.value}://${baseUrl.value}:${port.value}/Sessions/Logout`,
+            `${apiConstantsJson.protocol}://${apiConstantsJson.baseUrl}:${apiConstantsJson.port}/Sessions/Logout`,
             {},
             { headers: headers }
         );
