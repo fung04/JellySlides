@@ -197,48 +197,68 @@ export const initSwiper = () => {
 
     // Swiper event handlers with improved error handling
     swiper.value.on('beforeInit', async () => {
-        try {
-            // Load video data with timeout and error handling
-            const dataPromise = ApiClient.getAllVideoIds();
-            const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Data loading timeout')), 1000000)
-            );
-
-            videoIds = await Promise.race([dataPromise, timeoutPromise]);
-
-            // Handle empty data case
-            if (!videoIds || videoIds.length === 0) {
-                throw new Error('No video data available');
+        let retryCount = 0;
+        const BACKOFF_MAX = 30000; // Maximum backoff of 30 seconds
+        
+        async function attemptInitialization() {
+            try {
+                // Load video data with timeout and error handling
+                const dataPromise = ApiClient.getAllVideoIds();
+                const timeoutPromise = new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('Data loading timeout')), 1000000)
+                );
+                videoIds = await Promise.race([dataPromise, timeoutPromise]);
+                // Handle empty data case
+                if (!videoIds || videoIds.length === 0) {
+                    throw new Error('No video data available');
+                }
+                // Store in local scope only, not in window
+                window.videoIds = videoIds; // Keep for backward compatibility but will refactor
+                // Update DOM element cache after swiper creates slides
+                domElements.slides = document.querySelectorAll('.swiper-slide');
+                // Initialize first two slides
+                if (domElements.slides.length >= 2) {
+                    await updateSlide(domElements.slides[0], videoIds[0]);
+                    await updateSlide(domElements.slides[1], videoIds[1]);
+                }
+                // Preload additional slides
+                await preloadImages(2, PRELOAD_COUNT - 2);
+                // Start autoplay and update UI
+                sharedState.isSwiperInitialized = true;
+                currentIndex = 2; // Next index to load
+                
+                // Clear any existing error message if successful
+                const existingError = document.querySelector('.swiper-error');
+                if (existingError) {
+                    existingError.remove();
+                }
+                
+            } catch (error) {
+                retryCount++;
+                console.error(`Error during swiper initialization (attempt ${retryCount}):`, error);
+                
+                // Show/update status message
+                let statusMsg = document.querySelector('.swiper-error');
+                if (!statusMsg) {
+                    statusMsg = document.createElement('div');
+                    statusMsg.className = 'swiper-error';
+                    domElements.swiperContainer.appendChild(statusMsg);
+                }
+                statusMsg.innerHTML = `Connection issue detected. Retrying... (attempt ${retryCount})`;
+                
+                // Implement exponential backoff with a maximum cap
+                const backoffTime = Math.min(1000 * Math.pow(1.5, Math.min(retryCount, 10)), BACKOFF_MAX);
+                console.log(`Retrying in ${backoffTime/1000} seconds...`);
+                await new Promise(resolve => setTimeout(resolve, backoffTime));
+                
+                // Recursive retry
+                return attemptInitialization();
             }
-
-            // Store in local scope only, not in window
-            window.videoIds = videoIds; // Keep for backward compatibility but will refactor
-
-            // Update DOM element cache after swiper creates slides
-            domElements.slides = document.querySelectorAll('.swiper-slide');
-
-            // Initialize first two slides
-            if (domElements.slides.length >= 2) {
-                await updateSlide(domElements.slides[0], videoIds[0]);
-                await updateSlide(domElements.slides[1], videoIds[1]);
-            }
-
-            // Preload additional slides
-            await preloadImages(2, PRELOAD_COUNT - 2);
-
-            // Start autoplay and update UI
-            sharedState.isSwiperInitialized = true;
-            currentIndex = 2; // Next index to load
-
-        } catch (error) {
-            console.error('Error during swiper initialization:', error);
-            const errorMsg = document.createElement('div');
-            errorMsg.className = 'swiper-error';
-            errorMsg.innerHTML = 'Failed to load content. Please check your connection and refresh.';
-            domElements.swiperContainer.appendChild(errorMsg);
         }
+        
+        // Start the initialization process with unlimited retry capability
+        await attemptInitialization();
     });
-
     swiper.value.on('slideNextTransitionEnd', async () => {
         try {
             swiper.value.autoplay.pause();
