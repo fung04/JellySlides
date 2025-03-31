@@ -97,6 +97,12 @@ export const processMessageData = (message) => {
     // 3. No valid data found in the message
     if (!firstData.value) {
       console.warn("No valid playing item found in the message.");
+        // start autoplay if it was stop
+        if (!swiper.value.autoplay.running && sharedState.isWebSocketPlaying) {
+            swiper.value.autoplay.start();
+            console.log("No valid playing item found, starting autoplay.");
+
+        }
       previousDeviceId.value = null;
       return; // Exit the function, no action needed.
     }
@@ -114,6 +120,7 @@ export const processMessageData = (message) => {
         if (MediaChanged) {
 
             if (isPlaying) {
+                sharedState.isWebSocketPlaying = true;
                 const delay = swiper.value.autoplay.timeLeft < 2000 ? swiper.value.autoplay.timeLeft + 500 : 0;
                 setTimeout(() => (performTransition(nowPlayingName, MediaInfo)), delay);
             }
@@ -124,7 +131,8 @@ export const processMessageData = (message) => {
                     console.log("⏸️ Media Paused - starting autoplay");
                     swiper.value.autoplay.start();
                 }
-
+                
+                sharedState.isWebSocketPlaying = false;
                 previousMediaId.value = null; // Reset previousMediaId.value when going to pause state
                 previousDeviceId.value = null; // Reset previousDeviceId.value when going to pause state
                 firstData.value = null; // Reset firstData.value when going to pause state
@@ -138,7 +146,8 @@ export const processMessageData = (message) => {
                     console.log("⏸️ Media Paused - starting autoplay");
                     swiper.value.autoplay.start();
                 }
-
+                
+                sharedState.isWebSocketPlaying = false;
                 previousMediaId.value = null; // Reset previousMediaId.value when going to pause state
                 previousDeviceId.value = null; // Reset previousDeviceId.value when going to pause state
                 firstData.value = null; // Reset firstData.value when going to pause state
