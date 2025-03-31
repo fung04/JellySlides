@@ -333,6 +333,8 @@ export const initSwiper = () => {
     });
 
     swiper.value.on("resize",() =>{
+        if (sharedState.isWebSocketPlaying) return; // Dont start autoplay if websocket is playing
+
         swiper.value.update();
         if (swiper.value.autoplay.paused) {
             swiper.value.autoplay.resume();
