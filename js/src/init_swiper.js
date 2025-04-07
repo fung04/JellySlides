@@ -135,7 +135,8 @@ export const initSwiper = () => {
             const slideCaption = slide.querySelector('.swiper-slide-caption');
             const slideOverview = slide.querySelector('.swiper-slide-overview');
             const slideImage = slide.querySelector('img');
-
+            const slideElement = slideImage.closest('.swiper-slide');
+            console.log(`${videoData.id}, ${videoData.name}, ${videoData.imageType}`);
             // Apply blurhash first for quick display
             const blurhashValue = Object.values(videoData.blurhash)[0];
             await applyBackgroundBlurhash(blurhashValue, slide);
@@ -156,9 +157,25 @@ export const initSwiper = () => {
                 });
             }
 
+            if (slideElement) {
+                slideElement.classList.remove('is-portrait', 'is-landscape');
+                if (videoData.imageType === "primary") {
+                    console.log('Primary image type detected, applying portrait style');
+                    slideElement.classList.add('is-portrait');
+                    slideImage.style.objectFit = 'contain'; // Usually best for portrait
+                } else {
+                    slideElement.classList.add('is-landscape');
+                    // Apply your landscape object-fit rule
+                    slideImage.style.objectFit = 'cover'; // Or your specific logic
+                }
+                slideImage.style.display = 'block';
+            }
+            
+            
             // Update slide content
             slideImage.style.display = 'block';
             slideImage.src = imageUrl;
+            // slideImage.style.objectFit = videoData.imageType === "primary" ? 'contain' : 'cover';
             slideCaption.innerHTML = videoData.name || 'Untitled';
             slideOverview.innerHTML = videoData.overview || '';
 
@@ -259,6 +276,7 @@ export const initSwiper = () => {
         // Start the initialization process with unlimited retry capability
         await attemptInitialization();
     });
+    
     swiper.value.on('slideNextTransitionEnd', async () => {
         try {
             swiper.value.autoplay.pause();
