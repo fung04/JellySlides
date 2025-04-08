@@ -7,18 +7,23 @@
 
 html, body, #app {
   height: 100%;
-  overflow: hidden;
+  /* Consider adding width: 100% too for clarity */
+  width: 100%;
+  overflow: hidden; /* Prevents scrollbars on the body itself */
 }
 
 body {
+  /* Ensure body can grow slightly for safe areas on mobile */
   min-height: calc(100% + env(safe-area-inset-top));
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  font-family: 'Noto Sans Display', sans-serif; /* Set base font */
 }
 
 /* Control buttons */
 .control-buttons {
   position: absolute;
   right: 10px;
+  /* Using v-bind for dynamic bottom positioning based on Vue state */
   bottom: v-bind('showInfoPanel ? "calc(10% + 10px)" : "20px"');
   display: flex;
   gap: 10px;
@@ -34,6 +39,7 @@ body {
   padding: 8px 12px;
   cursor: pointer;
   transition: background 0.2s;
+  font-size: 0.9rem; /* Base font size */
 }
 
 .control-button:hover {
@@ -46,27 +52,33 @@ body {
   height: 100%;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: hidden; /* Should already be covered by html/body, but good practice */
 }
 
 .swiper-wrapper {
   display: flex;
-  flex: 1 0 90%;
-  min-height: 90%;
+  /* Using flex-grow to take up remaining space above info-wrapper */
+  flex: 1 1 auto;
+  /* min-height was 90%, using flex makes this adapt better */
+  min-height: 0; /* Needed for flex children in some browsers */
   width: 100%;
 }
 
 .info-wrapper {
   display: flex;
-  flex: 1 0 10%;
-  min-height: 10%;
+  /* Takes up space based on its content, up to a max */
+  flex: 0 0 auto; /* Don't grow, don't shrink, use auto basis */
+  min-height: 10%; /* Keep minimum height */
+  max-height: 15%; /* Add max height to prevent it taking too much space */
   flex-direction: row;
   justify-content: space-around;
   align-items: center;
   padding: 10px 20px;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6); /* Slightly darker for contrast */
   width: 100%;
-  position: static;
+  position: static; /* Default, kept for clarity */
+  z-index: 5; /* Ensure it's above slides if overlap occurs (unlikely here) */
+  /* Add styles for content inside info-wrapper for responsiveness if needed */
 }
 
 /* Slide styles */
@@ -76,42 +88,57 @@ body {
   height: 100%;
   overflow: hidden;
   display: flex;
+  /* Default to center alignment, override per orientation */
   align-items: center;
   justify-content: center;
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
   z-index: 0;
+  /* Default to landscape layout (full background image) */
+  flex-direction: column; /* Default assumption: content stacks */
 }
 
-/* Portrait mode layout */
+/* Portrait mode layout - Image and Text side-by-side */
+/* This class (.is-portrait) is likely added via JS based on aspect ratio */
 .swiper-slide.is-portrait {
   flex-direction: row;
   justify-content: space-around;
+  align-items: center; /* Center items vertically */
 }
 
 .swiper-slide img {
   position: relative;
-  display: none;
-  max-width: 50%;
-  max-height: 100%;
+  display: none; /* Hidden by default, shown via orientation classes */
   object-fit: contain;
   object-position: center center;
   z-index: 1;
-  width: auto;
-  height: 90%;
-  margin-left: 2%;
-  flex-shrink: 0;
+  width: auto; /* Let height dictate width */
+  height: 90%; /* Let container/max-height control size */
+  max-width: 100%; /* Prevent overflow */
+  max-height: 90%; /* Max height within the slide */
+  flex-shrink: 0; /* Prevent image from shrinking */
 }
 
-/* Landscape mode image reset */
+/* Portrait mode image styles */
+.swiper-slide.is-portrait img {
+  display: block; /* Show the image */
+  max-width: 45%; /* Take up slightly less than half */
+  max-height: 85%; /* Adjust max height for portrait */
+  margin: 0 2%; /* Add some horizontal margin */
+}
+
+/* Landscape mode image styles (if an explicit img tag is used for landscape) */
+/* This class (.is-landscape) is likely added via JS */
+/* If only background-image is used for landscape, this might not be needed */
 .swiper-slide.is-landscape img {
-  display: block;
+  display: block; /* Show image if present */
   width: 100%;
   height: 100%;
-  max-height: 100%;
   max-width: 100%;
+  max-height: 100%;
   margin: 0;
+  object-fit: cover; /* Cover might be better for landscape full bleed */
 }
 
 /* Caption styles - default/landscape */
@@ -141,20 +168,22 @@ body {
 
 /* Caption styles - portrait mode */
 .swiper-slide.is-portrait .caption-wrapper {
-  position: relative;
+  position: relative; /* Take space in flex layout */
   bottom: auto;
   left: auto;
-  width: auto;
-  max-width: 60%;
+  width: auto; /* Let content define width */
+  max-width: 50%; /* Take up remaining space next to image */
   z-index: 1;
-  margin-right: 2%;
-  margin-left: 2%;
+  margin: 0 2%; /* Match image margin */
   background: rgba(0, 0, 0, 0.75);
   border-radius: 6px;
-  padding: 10px 15px;
-  align-self: center;
-  text-align: center;
-  align-items: center;
+  padding: 15px 20px; /* Increased padding */
+  align-self: center; /* Vertically center */
+  text-align: left; /* Align text left */
+  align-items: flex-start; /* Align items (like text blocks) to start */
+  height: auto; /* Fit content */
+  max-height: 85%; /* Match image max-height roughly */
+  overflow: hidden; /* Hide potential overflow before text clamps */
 }
 
 /* Caption content styles */
@@ -164,9 +193,11 @@ body {
   font-weight: bold;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
   margin-bottom: 10px;
-  width: 90%;
+  width: 100%; /* Full width within caption-wrapper */
   text-align: left;
-  font-size: clamp(1.3em, 3.5vw, 2.2em);
+  /* Responsive font size: min, preferred (viewport width based), max */
+  font-size: clamp(1.2rem, 3vw + 0.5rem, 2.2rem); /* Adjusted clamp */
+  line-height: 1.3;
 }
 
 .swiper-slide-overview {
@@ -174,64 +205,135 @@ body {
   font-family: 'Noto Sans Display', sans-serif;
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
   text-align: left;
-  width: 70%;
-  font-size: clamp(0.8em, 2vw, 1.0em);
-  max-height: 7em;
+  width: 100%; /* Full width within caption-wrapper */
+  /* Responsive font size: min, preferred (viewport width based), max */
+  font-size: clamp(0.8rem, 1.5vw + 0.5rem, 1.1rem); /* Adjusted clamp */
+  line-height: 1.5;
+  /* Max height based on line height and desired lines */
+  max-height: calc(1.5em * 5); /* Approx 5 lines visible */
   overflow-y: auto;
-  padding-right: 5px;
+  padding-right: 8px; /* Space for scrollbar */
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
 }
 
-/* Portrait mode text adjustments */
-.swiper-slide.is-portrait .swiper-slide-caption,
-.swiper-slide.is-portrait .swiper-slide-overview {
-  width: 100%;
-  text-align: left;
-}
-
+/* Portrait mode text adjustments (already handled by .is-portrait .caption-wrapper) */
+/* Simplified - width is 100% by default now */
 .swiper-slide.is-portrait .swiper-slide-caption {
   margin-bottom: 8px;
 }
 
 .swiper-slide.is-portrait .swiper-slide-overview {
-  max-height: 8em;
+  /* Allow slightly more lines in portrait side-by-side view */
+  max-height: calc(1.5em * 6); /* Approx 6 lines */
 }
 
 /* Scrollbar styling */
 .swiper-slide-overview::-webkit-scrollbar {
   width: 5px;
 }
-
 .swiper-slide-overview::-webkit-scrollbar-track {
   background: transparent;
 }
-
 .swiper-slide-overview::-webkit-scrollbar-thumb {
   background-color: rgba(255, 255, 255, 0.4);
   border-radius: 10px;
 }
 
-/* Responsive styles */
-@media (max-width: 768px), (orientation: portrait) {
-  .caption-wrapper {
-    padding: 4%;
+/* --- Responsive Adjustments --- */
+
+/* Small devices (phones, portrait and landscape) */
+@media (max-width: 767px) {
+  .control-buttons {
+    gap: 8px;
+    right: 8px;
+    /* Adjust bottom based on safe area if needed, might be complex with v-bind */
+    bottom: v-bind('showInfoPanel ? "calc(10% + 8px)" : "calc(15px + env(safe-area-inset-bottom))"'); /* Adjust for safe area */
+  }
+  .control-button {
+    padding: 6px 10px;
+    font-size: 0.8rem;
   }
 
+  .info-wrapper {
+    padding: 8px 15px;
+    min-height: 8%; /* Slightly reduce min height */
+    max-height: 12%;
+    /* Consider changing flex-direction to column if content needs stacking */
+  }
+
+  .caption-wrapper { /* Landscape on small device */
+    padding: 3% 4%;
+  }
+
+  .swiper-slide-caption { /* Landscape on small device */
+     font-size: clamp(1.1rem, 4vw + 0.5rem, 1.8rem); /* Smaller max */
+  }
+  .swiper-slide-overview { /* Landscape on small device */
+     font-size: clamp(0.75rem, 2vw + 0.5rem, 1.0rem); /* Smaller max */
+     max-height: calc(1.5em * 4); /* Fewer lines visible */
+  }
+
+  /* Portrait on small device */
+  .swiper-slide.is-portrait {
+     /* Stack image and caption vertically on very small screens */
+     flex-direction: column;
+     justify-content: flex-start; /* Align to top */
+     padding-top: 5%; /* Add some padding */
+  }
+  .swiper-slide.is-portrait img {
+      max-width: 80%; /* Allow image to be wider when stacked */
+      max-height: 50%; /* Limit image height */
+      margin: 0 0 15px 0; /* Margin below image */
+  }
   .swiper-slide.is-portrait .caption-wrapper {
-    margin-top: 10px;
-    padding: 8px 12px;
-    max-width: 95%;
+      position: relative; /* Keep relative for stacking */
+      max-width: 90%; /* Wider caption when stacked */
+      margin: 0 auto; /* Center horizontally */
+      padding: 10px 15px;
+      max-height: none; /* Remove max-height, let content flow */
+      align-self: stretch; /* Stretch to container width (within max-width) */
   }
-
-  .swiper-slide-caption {
-    margin-bottom: 8px;
+  .swiper-slide.is-portrait .swiper-slide-caption {
+      font-size: clamp(1.1rem, 4vw + 0.5rem, 1.8rem);
   }
-
-  .swiper-slide-overview {
-    max-height: 6em;
+  .swiper-slide.is-portrait .swiper-slide-overview {
+       font-size: clamp(0.75rem, 2vw + 0.5rem, 1.0rem);
+       max-height: calc(1.5em * 5); /* Adjust lines for stacked portrait */
   }
 }
+
+/* Medium devices (tablets, portrait) */
+/* Using orientation + min-width to target tablets specifically */
+@media (min-width: 768px) and (max-width: 1023px) and (orientation: portrait) {
+  .swiper-slide.is-portrait img {
+    max-width: 40%; /* Adjust image/text ratio for portrait tablets */
+  }
+  .swiper-slide.is-portrait .caption-wrapper {
+    max-width: 55%;
+    padding: 20px 25px;
+  }
+   .swiper-slide.is-portrait .swiper-slide-caption {
+      font-size: clamp(1.4rem, 2.5vw + 0.7rem, 2.4rem);
+  }
+  .swiper-slide.is-portrait .swiper-slide-overview {
+       font-size: clamp(0.9rem, 1.2vw + 0.6rem, 1.2rem);
+       max-height: calc(1.5em * 7); /* More lines on tablet */
+  }
+}
+
+/* Larger devices (desktops) */
+@media (min-width: 1024px) {
+  /* Optional: Increase base font sizes or spacing slightly for large screens */
+  .swiper-slide-caption { /* Landscape on Desktop */
+     /* Clamp values already handle large sizes, but can fine-tune */
+     font-size: clamp(1.5rem, 3vw + 0.5rem, 2.5rem);
+  }
+  .swiper-slide-overview { /* Landscape on Desktop */
+     max-height: calc(1.5em * 6); */ /* Allow more lines
+  }
+}
+
 
 /* Loading animations */
 .swiper-lazy-preloader {
