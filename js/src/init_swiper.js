@@ -11,9 +11,9 @@ export const initSwiper = () => {
         effect: "fade",
         fadeEffect: { crossFade: true },
         loop: true,
-        speed: 1000,
+        speed: 3000,
         autoplay: {
-            delay: 10000,
+            delay: 20000,
             disableOnInteraction: false,
             pauseOnMouseEnter: false,
         },
@@ -86,6 +86,7 @@ export const initSwiper = () => {
                     img.onerror = () => reject(new Error(`Failed to load image for ${videoIds[index].id}`));
                     img.src = url;
                 });
+                promises.push(promise);
             }
             await Promise.allSettled(promises);
         } catch (error) {
