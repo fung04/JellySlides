@@ -1,92 +1,134 @@
-/* Navigation buttons */
-.swiper-button-next,
-.swiper-button-prev {
-    color: white;
-    background: rgba(0, 0, 0, 0.5);
-    padding: 30px 20px;
-    border-radius: 5px;
+/* Top Right Clock */
+#top-right-clock {
+  position: absolute;
+  top: 10px; /* Adjust as needed */
+  /* Consider safe area for mobile notches */
+  /* top: calc(env(safe-area-inset-top, 0px) + 10px); */
+  right: 10px;
+  /* right: calc(env(safe-area-inset-right, 0px) + 10px); */
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  z-index: 100; /* Above swiper, below potential dropdown */
+  transition: background 0.2s;
+  font-family: 'Noto Sans Display', sans-serif;
 }
 
-/* Fullscreen toggle button */
-/* #fullscreenToggle {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 1000;
-    background: rgba(0, 0, 0, 0.5);
-    color: white;
-    border: none;
-    padding: 10px;
-    cursor: pointer;
-    font: 1em sans-serif;
+#top-right-clock:hover {
+  background: rgba(0, 0, 0, 0.7);
 }
 
-#fullscreenToggle:hover {
-    background: rgba(0, 0, 0, 0.7);
-} */
+/* Updated Info Wrapper Layout */
+.info-wrapper {
+  display: flex;
+  flex: 0 0 auto; /* Don't grow, don't shrink, use auto basis */
+  min-height: 8%; /* Slightly reduced default height */
+  max-height: 15%;
+  flex-direction: row;
+  justify-content: space-between; /* Pushes content left and options right */
+  align-items: center;
+  padding: 5px 20px; /* Adjusted padding */
+  background: rgba(0, 0, 0, 0.7); /* Slightly darker */
+  width: 100%;
+  position: static;
+  z-index: 5;
+  box-sizing: border-box;
+}
 
-/* #logoutButton {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    z-index: 1000;
-    background: rgba(0, 0, 0, 0.5);
-    color: white;
-    border: none;
-    padding: 10px;
-    cursor: pointer;
-} */
+/* Placeholder for potential future content on the left */
+.info-placeholder {
+    flex-grow: 1; /* Takes up available space */
+    /* Add styles if you put content here */
+    color: #ccc;
+    font-size: 0.9rem;
+}
+
+
+/* Options Menu Container */
+.options-menu-container {
+  position: relative; /* Anchor for the absolute positioned dropdown */
+  display: flex;
+  align-items: center;
+}
+
+/* More Options Button (Three Dots) */
+.more-options-button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.8rem; /* Adjust size of dots */
+  line-height: 1;
+  padding: 5px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.more-options-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Options Dropdown Menu */
+.options-dropdown {
+  position: absolute;
+  bottom: calc(100% + 5px); /* Position above the button with 5px gap */
+  right: 0; /* Align with the right edge of the container */
+  background: rgba(40, 40, 40, 0.95); /* Darker background */
+  border-radius: 5px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+  z-index: 110; /* Above clock and info-wrapper */
+  overflow: hidden; /* Ensures children conform to border-radius */
+  min-width: 120px; /* Minimum width */
+  padding: 5px 0; /* Padding top/bottom */
+}
+
+/* Buttons inside the Dropdown */
+.dropdown-button {
+  display: block;
+  width: 100%;
+  padding: 10px 15px;
+  background: none;
+  border: none;
+  color: #e0e0e0;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-family: 'Noto Sans Display', sans-serif;
+  transition: background 0.2s, color 0.2s;
+}
+
+.dropdown-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
 
 /* Loading spinner */
+.loading-spinner {
+  display: block;
+  /* Hidden by default, show when loading */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top: 4px solid #fff;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  z-index: 1001;
+}
 
-/* Fullscreen button styling */
-/* #fullscreenToggle {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 1000;
-    background: rgba(0, 0, 0, 0.3);
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 5px 10px;
-    cursor: pointer;
-    font-size: 1.2em;
+@keyframes spin {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
   }
-   */
-/* 
-  .loading-spinner {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 50px;
-    height: 50px;
-    border: 3px solid #f3f3f3;
-    border-top: 3px solid #3498db;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    z-index: 1000;
-    display: block;
-} */
 
-  /* Loading spinner */
-  .loading-spinner {
-    display: block; /* Hidden by default, show when loading */
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border: 4px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    border-top: 4px solid #fff;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
-    z-index: 1001;
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
   }
-  
-  @keyframes spin {
-    0% { transform: translate(-50%, -50%) rotate(0deg); }
-    100% { transform: translate(-50%, -50%) rotate(360deg); }
-  }
+}
