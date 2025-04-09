@@ -1,6 +1,7 @@
 const ImageType = {
     backdrop: 'backdrop',
     primary: 'primary',
+    thumbnail: 'thumb',
 };
 
 const VideoType = {
@@ -144,19 +145,52 @@ class ApiClient {
         } 
         else {
             // Original code for non-series/boxset items
-            const videoIds = jsonData['Items']
-                .filter(item => item['ImageTags'] && item['ImageBlurHashes'][hashtype])
-                .map(item => ({
+            // 1. Filter the items first
+            const filteredItems = jsonData['Items'].filter(item =>
+                // Ensure ImageTags and the specific ImageBlurHashes exist
+                item['ImageTags'] && item['ImageBlurHashes'] && item['ImageBlurHashes'][hashtype]
+            );
+
+            // 2. Map the filtered items with the new conditional logic for 'name'
+            const videoIds = filteredItems.map(item => {
+                let calculatedName = ''; // Initialize a variable for the name
+
+                if (videoType === VideoType.season) {
+                    // Ensure item['Name'] exists before checking its content
+                    const itemNameLower = item['Name'] ? item['Name'].toLowerCase() : '';
+                    // Check if the item name contains "season" or "special" (case-insensitive)
+                    if (itemNameLower.includes('season') || itemNameLower.includes('special')) {
+                        // If true, use SeriesName (provide a fallback if SeriesName might be missing)
+                        calculatedName = item['SeriesName'] || '';
+                    } else {
+                        // If false, use the item's Name
+                        calculatedName = item['Name'] || '';
+                    }
+                    // Note: The original code appended SeriesName with a newline.
+                    // If you still want that behavior *sometimes*, adjust the logic here.
+                    // For example, if you wanted Name + SeriesName ONLY when Name doesn't contain season/special:
+                    // else {
+                    //     calculatedName = (item['Name'] || '') + "\n" + (item['SeriesName'] || '');
+                    // }
+                    // Based on your prompt, it seems you want *either* SeriesName *or* Name, not concatenation.
+
+                } else {
+                    // If not a season, use the item's Name (provide a fallback)
+                    calculatedName = item['Name'] || '';
+                }
+
+                // 3. Construct the final object for the map
+                return {
                     id: item['Id'],
-                    // concat the series name and and name if it's a season
-                    name: videoType === VideoType.season ? item['Name'] + "\n" + item['SeriesName'] : item['Name'],
-                    overview: item['Overview'] ? item['Overview'] : '',
+                    name: calculatedName, // Use the conditionally determined name
+                    overview: item['Overview'] ? item['Overview'] : '', // Keep existing overview logic
                     type: item['Type'],
                     blurhash: item['ImageBlurHashes'][hashtype],
                     imageType: imageType,
-                }));
-            
-            return videoIds;
+                };
+            });
+
+            return videoIds
         }     
             
     }
@@ -223,7 +257,9 @@ class ApiClient {
         const season = await ApiClient.getVideoIds({ userId, imageType: ImageType.primary, videoType: VideoType.season });
         const audio = await ApiClient.getVideoIds({ userId, imageType: ImageType.primary, videoType: VideoType.audio });
         const movie_backdrop = await ApiClient.getVideoIds({ userId, imageType: ImageType.backdrop, videoType: VideoType.movie });
-        const series_backdrop = await ApiClient.getVideoIds({ userId, imageType: ImageType.backdrop, videoType: VideoType.series });
+        const series_thumbnail = await ApiClient.getVideoIds({ userId, imageType: ImageType.backdrop, videoType: VideoType.series });
+        const movie_thumbnail = await ApiClient.getVideoIds({ userId, imageType: ImageType.thumbnail, videoType: VideoType.movie });
+        const series_backdrop = await ApiClient.getVideoIds({ userId, imageType: ImageType.thumbnail, videoType: VideoType.series });
         const boxset_backdrop = await ApiClient.getVideoIds({ userId, imageType: ImageType.backdrop, videoType: VideoType.boxset });
 
         // show all list length
@@ -233,13 +269,21 @@ class ApiClient {
         console.log('season', season.length);
         console.log('movie_backdrop', movie_backdrop.length);
         console.log('series_backdrop', series_backdrop.length);
+        console.log('movie_thumbnail', movie_thumbnail.length);
+        console.log('series_thumbnail', series_thumbnail.length);
         console.log('boxset_backdrop', boxset_backdrop.length);
         console.log('audio', audio.length);
 
-        const combineList = [...movie, ...series, ...boxset, ...season, ...movie_backdrop, ...series_backdrop, ...boxset_backdrop, ...audio];
+        const combineList = [...movie, ...series, ...boxset, ...season, ...movie_backdrop, ...series_backdrop, ...boxset_backdrop, ...audio, ...movie_thumbnail, ...series_thumbnail];
         console.log('combineList', combineList.length);
-        combineList.sort(() => Math.random() - 0.5);
+        
         // audio.sort(() => Math.random() - 0.5);
+
+        // shuffle with Fisher-Yates algorithm
+        for (let i = combineList.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [combineList[i], combineList[j]] = [combineList[j], combineList[i]];
+        }
         
         return combineList;
         // return audio;
