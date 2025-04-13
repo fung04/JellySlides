@@ -377,6 +377,7 @@ export const initSwiper = () => {
         if (e.key === 'ArrowRight') {
             swiper.value.slideNext();
             swiper.value.autoplay.start();
+            sharedState.isWebSocketPlaying = false; // Continue autoplay and ignore websocket playing
         }
         if (e.key === 'ArrowLeft') swiper.value.slidePrev();
         if (e.key === 'i') console.log(swiper.value.realIndex);
