@@ -160,7 +160,7 @@ export const initSwiper = () => {
 
             if (slideElement) {
                 slideElement.classList.remove('is-portrait', 'is-landscape');
-                if (videoData.imageType === "primary") {
+                if (videoData.imageType === "Primary") {
                     console.log('Primary image type detected, applying portrait style');
                     slideElement.classList.add('is-portrait');
                     slideImage.style.objectFit = 'contain'; // Usually best for portrait

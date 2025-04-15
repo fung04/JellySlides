@@ -1,7 +1,7 @@
 const ImageType = {
-    backdrop: 'backdrop',
-    primary: 'primary',
-    thumbnail: 'thumb',
+    backdrop: 'Backdrop',
+    primary: 'Primary',
+    thumbnail: 'Thumb',
 };
 
 const VideoType = {
@@ -96,7 +96,7 @@ class ApiClient {
         }
       
         const jsonData = await response.json();
-        const hashtype = imageType === 'primary' ? 'Primary' : 'Backdrop';
+        const hashtype = imageType === ImageType.backdrop ? 'Backdrop' : imageType === ImageType.thumbnail ? 'Thumb' : 'Primary';
     
         if (videoType ===  VideoType.boxset) { // || videoType ===  VideoType.audio 
             const parentIds = jsonData['Items'].map(item => ({ id: item['Id'] }));
