@@ -1,7 +1,7 @@
 import { ref, reactive } from '../lib/vue.esm-browser.min.js';
 
 export const sharedState = reactive({
-  showInfoPanel: ref(true),
+  showInfoPanel: ref(false),
   showOptionsMenu: ref(false),
   isLoggedIn: ref(false),
   isLoggingIn: ref(false),
