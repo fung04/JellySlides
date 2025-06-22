@@ -56,6 +56,7 @@ const resetPlaybackState = () => {
     if (swiper.value && !swiper.value.autoplay.running) {
         console.log("Ensuring Swiper autoplay is running after state reset.");
         swiper.value.autoplay.start();
+        swiper.value.slideNext();
     }
 };
 
@@ -126,6 +127,7 @@ const performSlideTransition = async (mediaInfo) => {
     }
     const nowPlayingName = mediaInfo.Name || "Unknown Track";
     const mediaId = mediaInfo.Id;
+    const mediaType = mediaInfo.MediaType
 
     // Update previousMediaId immediately
     previousMediaId.value = mediaId;
@@ -169,6 +171,21 @@ const performSlideTransition = async (mediaInfo) => {
         imageUrl = result.imageUrl || imageUrl; // Use fetched URL or fallback
         if (result.blurhashId && Object.values(result.blurhashId).length > 0) {
             blurhashValue = Object.values(result.blurhashId)[0];
+            console.log(mediaInfo)
+            
+            if (targetSlide) {
+                targetSlide.classList.remove('is-portrait', 'is-landscape');
+                if (mediaType === "Audio") {
+                    console.log('Primary image type detected, applying portrait style');
+                    targetSlide.classList.add('is-portrait');
+                    nextSlideImage.style.objectFit = 'contain'; // Usually best for portrait
+                } else {
+                    targetSlide.classList.add('is-landscape');
+                    // Apply your landscape object-fit rule
+                    nextSlideImage.style.objectFit = 'cover'; // Or your specific logic
+                }
+                nextSlideImage.style.display = 'block';
+            }
         }
 
         // Apply blurhash background *before* loading the main image
@@ -195,7 +212,7 @@ const performSlideTransition = async (mediaInfo) => {
 
     // Update text content
     nextSlideCaption.innerHTML = nowPlayingName;
-    nextSlideOverview.innerHTML = mediaInfo.Album || "Now Playing"; // Use Album or default text
+    nextSlideOverview.innerHTML = mediaInfo.Album || mediaInfo.Overview // Use Album or default text
 
     // Perform the slide transition if needed
     console.log(`Current index ${swiper.value.activeIndex}, preparing to slide to index ${targetSlideIndex} for media ${mediaId}`);
