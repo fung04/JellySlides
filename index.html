@@ -56,32 +56,30 @@
 
 <body>
   <div id="app">
-    <transition name="fade" v-cloak>
-      <div class="login-container" v-if="!sharedState.isLoggedIn">
-        <div class="login-header">
-           <h1>Jellyfin Slideshow</h1>
-           <p>Sign in to access your media collection</p>
-         </div>
-         <form @submit.prevent="login">
-           <div class="form-group">
-             <label for="url">Server Address</label>
-             <input type="text" id="url" v-model="baseUrl" placeholder="example.jellyfin.org" required />
-           </div>
-           <div class="form-group">
-             <label for="username">Username</label>
-             <input type="text" id="username" v-model="UserName" placeholder="Enter your username" required />
-           </div>
-           <div class="form-group">
-             <label for="password">Password</label>
-             <input type="password" id="password" v-model="Password" placeholder="Enter your password"
-               autocomplete="current-password" required />
-           </div>
-           <button type="submit" class="login-button" :class="{ 'button-loading': sharedState.isLoggingIn }">
-             {{ sharedState.isLoggingIn ? 'Signing in...' : 'Sign In' }}
-           </button>
-         </form>
-      </div>
-    </transition>
+    <div class="login-container" v-if="!sharedState.isLoggedIn" v-cloak>
+      <div class="login-header">
+          <h1>Jellyfin Slideshow</h1>
+          <p>Sign in to access your media collection</p>
+        </div>
+        <form @submit.prevent="login">
+          <div class="form-group">
+            <label for="url">Server Address</label>
+            <input type="text" id="url" v-model="baseUrl" placeholder="example.jellyfin.org" required />
+          </div>
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" v-model="UserName" placeholder="Enter your username" required />
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" v-model="Password" placeholder="Enter your password"
+              autocomplete="current-password" required />
+          </div>
+          <button type="submit" class="login-button" :class="{ 'button-loading': sharedState.isLoggingIn }">
+            {{ sharedState.isLoggingIn ? 'Signing in...' : 'Sign In' }}
+          </button>
+        </form>
+    </div>
 
     <transition name="fade" v-cloak>
       <div class="swiper-container" v-if="sharedState.isLoggedIn">
