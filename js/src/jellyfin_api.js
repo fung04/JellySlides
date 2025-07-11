@@ -35,7 +35,7 @@ class ApiConstant {
 class ApiClient {
     static getImageUrl(videoId, imageType) {
         if (imageType) {
-            return `${ApiConstant.protocol}://${ApiConstant.baseUrl}:${ApiConstant.port}/Items/${videoId}/Images/${imageType}/?quality=50&fillHeight=720&fillWidth=1280`;
+            return `${ApiConstant.protocol}://${ApiConstant.baseUrl}:${ApiConstant.port}/Items/${videoId}/Images/${imageType}/?quality=100&fillHeight=720&fillWidth=1280`;
         } else {
             return ApiClient._getVideoDetails(videoId).then(details => {
                 const availableImageType = details.ImageTags ? Object.keys(details.ImageTags)[0] : null;
