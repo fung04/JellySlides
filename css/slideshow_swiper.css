@@ -338,6 +338,21 @@ body {
   .swiper-slide:not(.is-portrait) .swiper-slide-overview {
     max-height: calc(1.4em * 4);
   }
+  
+  .portrait-card {
+    flex-direction: row-reverse;
+    height: 80vh;
+    width: 85vw;
+  }
+
+  .swiper-slide.is-portrait img {
+    max-width: 45vw;
+  }
+
+  .swiper-slide.is-portrait .caption-wrapper {
+    max-height: 50vh;
+  }
+
 }
 
 /* Large devices (desktops) */
