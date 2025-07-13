@@ -95,36 +95,6 @@ export const initSwiper = () => {
         }
     }
 
-    // Apply blurhash to slide background with better error handling
-    // async function applyBackgroundBlurhash(hash, slide) {
-    //     if (!hash) {
-    //         console.warn('Missing blurhash, applying fallback background');
-    //         slide.style.backgroundColor = '#333'; // Fallback color
-    //         return;
-    //     }
-
-    //     const MAX_DIMENSION = 32;
-    //     const aspectRatio = slide.offsetWidth / slide.offsetHeight || 16 / 9; // Fallback aspect ratio
-
-    //     const width = aspectRatio > 1 ? MAX_DIMENSION : Math.round(MAX_DIMENSION * aspectRatio);
-    //     const height = aspectRatio > 1 ? Math.round(MAX_DIMENSION / aspectRatio) : MAX_DIMENSION;
-
-    //     try {
-    //         const imgData = await blurhash.decodePromise(hash, width, height);
-    //         const canvas = blurhash.drawImageDataOnNewCanvas(imgData, width, height);
-    //         slide.style.backgroundImage = `url(${canvas.toDataURL()})`;
-
-    //         // Clean up canvas to avoid memory leaks
-    //         setTimeout(() => {
-    //             canvas.width = 0;
-    //             canvas.height = 0;
-    //         }, 5000);
-    //     } catch (error) {
-    //         console.error('Error applying blurhash:', error);
-    //         slide.style.backgroundColor = '#333'; // Fallback color
-    //     }
-    // }
-
     // Update slide content with error handling
     async function updateSlide(slide, videoData) {
         if (!slide || !videoData) {
@@ -206,7 +176,7 @@ export const initSwiper = () => {
     swiper.value.on('beforeInit', async () => {
         let retryCount = 0;
         const BACKOFF_MAX = 30000; // Maximum backoff of 30 seconds
-        
+
         async function attemptInitialization() {
             try {
                 // Load video data with timeout and error handling
@@ -233,17 +203,17 @@ export const initSwiper = () => {
                 // Start autoplay and update UI
                 sharedState.isSwiperInitialized = true;
                 currentIndex = 2; // Next index to load
-                
+
                 // Clear any existing error message if successful
                 const existingError = document.querySelector('.swiper-error');
                 if (existingError) {
                     existingError.remove();
                 }
-                
+
             } catch (error) {
                 retryCount++;
                 console.error(`Error during swiper initialization (attempt ${retryCount}):`, error);
-                
+
                 // Show/update status message
                 let statusMsg = document.querySelector('.swiper-error');
                 if (!statusMsg) {
@@ -252,21 +222,21 @@ export const initSwiper = () => {
                     domElements.swiperContainer.appendChild(statusMsg);
                 }
                 statusMsg.innerHTML = `Connection issue detected. Retrying... (attempt ${retryCount})`;
-                
+
                 // Implement exponential backoff with a maximum cap
                 const backoffTime = Math.min(1000 * Math.pow(1.5, Math.min(retryCount, 10)), BACKOFF_MAX);
-                console.log(`Retrying in ${backoffTime/1000} seconds...`);
+                console.log(`Retrying in ${backoffTime / 1000} seconds...`);
                 await new Promise(resolve => setTimeout(resolve, backoffTime));
-                
+
                 // Recursive retry
                 return attemptInitialization();
             }
         }
-        
+
         // Start the initialization process with unlimited retry capability
         await attemptInitialization();
     });
-    
+
     swiper.value.on('slideNextTransitionEnd', async () => {
         try {
             swiper.value.autoplay.pause();
@@ -284,26 +254,26 @@ export const initSwiper = () => {
             // Find slide that needs updating (typically the one after current)
             const nextSlideIndex = swiper.value.previousIndex
             const nextSlide = swiper.value.slides[nextSlideIndex];
-            
+
             // Prioritize showing unseen content if available
             let videoToShow = videoIds[currentIndex];
             let attemptsToFindUnseen = 0;
-            
+
             // Try to find unseen content (but limit attempts to avoid infinite loop)
             while (viewedSlides.has(videoToShow.id) && attemptsToFindUnseen < videoIds.length) {
                 currentIndex = (currentIndex + 1) % videoIds.length;
                 videoToShow = videoIds[currentIndex];
                 attemptsToFindUnseen++;
             }
-            
+
             // If we've seen everything, reset tracking to show all again
             if (attemptsToFindUnseen >= videoIds.length) {
                 viewedSlides.clear();
             }
-            
+
             // console.log(`Current index: ${swiper.value.activeIndex}, next slide index: ${nextSlideIndex}, real index: ${swiper.value.realIndex}`);
             // console.log(`Selected video ${videoToShow.name} (attempt ${attemptsToFindUnseen})`);
-            
+
             // Update next slide
             await updateSlide(nextSlide, videoToShow);
 
@@ -325,7 +295,7 @@ export const initSwiper = () => {
         }
     });
 
-    swiper.value.on("doubleClick", () =>{
+    swiper.value.on("doubleClick", () => {
         const container = domElements.swiperContainer;
 
         if (!document.fullscreenElement) {
@@ -340,7 +310,7 @@ export const initSwiper = () => {
 
     });
 
-    swiper.value.on("resize",() =>{
+    swiper.value.on("resize", () => {
         if (sharedState.isWebSocketPlaying) return; // Dont start autoplay if websocket is playing
 
         swiper.value.update();
@@ -353,7 +323,7 @@ export const initSwiper = () => {
     swiper.value.on('init', () => {
         // Request wake lock to keep screen on
         requestWakeLock().catch(err => console.warn('Wake lock request failed:', err));
-        
+
         // Start with autoplay stopped
         swiper.value.autoplay.start();
     });
