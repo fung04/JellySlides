@@ -130,7 +130,7 @@ export const initSwiper = () => {
             }
 
             if (slideElement) {
-                updateSlideLayout(slideElement, videoData);
+                await updateSlideLayout(slideElement, videoData);
             }
 
             // Update slide content

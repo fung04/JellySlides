@@ -174,16 +174,7 @@ const performSlideTransition = async (mediaInfo) => {
             console.log(mediaInfo)
             
             if (targetSlide) {
-                targetSlide.classList.remove('is-portrait', 'is-landscape');
-                if (mediaType === "Audio") {
-                    console.log('Primary image type detected, applying portrait style');
-                    targetSlide.classList.add('is-portrait');
-                    nextSlideImage.style.objectFit = 'contain'; // Usually best for portrait
-                } else {
-                    targetSlide.classList.add('is-landscape');
-                    // Apply your landscape object-fit rule
-                    nextSlideImage.style.objectFit = 'cover'; // Or your specific logic
-                }
+                await updateSlideLayout(targetSlide, mediaType === "Audio" ? { imageType: "Primary" } : { imageType: "Backdrop" });
                 nextSlideImage.style.display = 'block';
             }
         }
