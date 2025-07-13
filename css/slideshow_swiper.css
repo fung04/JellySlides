@@ -1,4 +1,34 @@
-/* Reset and base styles */
+:root {
+  /* Colors */
+  --c-primary: #ffffff;
+  --c-secondary: #e0e0e0;
+  --c-background: #000000;
+  --c-accent: #007aff;
+
+  /* Gradients & Overlays */
+  --gradient-text-protection: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(0, 0, 0, 0.7) 30%,
+    rgba(0, 0, 0, 0.4) 60%,
+    transparent 100%
+  );
+  --overlay-dark: rgba(10, 10, 10, 0.7);
+  --overlay-info-panel: rgba(20, 20, 20, 0.85);
+
+  /* Typography */
+  --font-primary: 'Inter', 'Noto Sans Display', sans-serif;
+  --font-secondary: 'Roboto', sans-serif;
+
+  /* Spacing & Sizing */
+  --spacing-base: 1rem;
+  --spacing-md: calc(var(--spacing-base) * 1.5);
+  --spacing-lg: calc(var(--spacing-base) * 2);
+  --border-radius: 12px;
+  --transition-speed: 0.4s;
+}
+
+/* ===== RESET & BASE STYLES ===== */
 * {
   margin: 0;
   padding: 0;
@@ -7,114 +37,111 @@
 
 html, body, #app {
   height: 100%;
-  /* Consider adding width: 100% too for clarity */
   width: 100%;
-  overflow: hidden; /* Prevents scrollbars on the body itself */
+  overflow: hidden;
 }
 
 body {
-  /* Ensure body can grow slightly for safe areas on mobile */
   min-height: calc(100% + env(safe-area-inset-top));
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-  font-family: 'Noto Sans Display', sans-serif; /* Set base font */
+  font-family: 'Noto Sans Display', sans-serif;
 }
 
-/* Swiper container structure */
+/* ===== SWIPER CONTAINER ===== */
 .swiper-container {
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* Should already be covered by html/body, but good practice */
+  overflow: hidden;
 }
 
 .swiper-wrapper {
   display: flex;
-  /* Using flex-grow to take up remaining space above info-wrapper */
   flex: 1 1 auto;
-  /* min-height was 90%, using flex makes this adapt better */
-  min-height: 0; /* Needed for flex children in some browsers */
+  min-height: 0;
   width: 100%;
 }
 
 .info-wrapper {
   display: flex;
-  /* Takes up space based on its content, up to a max */
-  flex: 0 0 auto; /* Don't grow, don't shrink, use auto basis */
-  min-height: 10%; /* Keep minimum height */
-  max-height: 15%; /* Add max height to prevent it taking too much space */
+  flex: 0 0 auto;
+  min-height: 10%;
+  max-height: 15%;
   flex-direction: row;
   justify-content: space-around;
   align-items: center;
   padding: 10px 20px;
-  background: rgba(0, 0, 0, 0.6); /* Slightly darker for contrast */
+  background: rgba(0, 0, 0, 0.6);
   width: 100%;
-  position: static; /* Default, kept for clarity */
-  z-index: 5; /* Ensure it's above slides if overlap occurs (unlikely here) */
-  /* Add styles for content inside info-wrapper for responsiveness if needed */
+  position: static;
+  z-index: 5;
 }
 
-/* Slide styles */
+/* ===== SLIDE STYLES ===== */
 .swiper-slide {
   position: relative;
   width: 100%;
   height: 100%;
   overflow: hidden;
   display: flex;
-  /* Default to center alignment, override per orientation */
   align-items: center;
   justify-content: center;
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
   z-index: 0;
-  /* Default to landscape layout (full background image) */
-  flex-direction: column; /* Default assumption: content stacks */
-}
-
-/* Portrait mode layout - Image and Text side-by-side */
-/* This class (.is-portrait) is likely added via JS based on aspect ratio */
-.swiper-slide.is-portrait {
-  flex-direction: row;
-  justify-content: space-around;
-  align-items: center; /* Center items vertically */
+  flex-direction: column;
 }
 
 .swiper-slide img {
-  position: relative;
-  display: none; /* Hidden by default, shown via orientation classes */
-  object-fit: contain;
-  object-position: center center;
-  z-index: 1;
-  width: auto; /* Let height dictate width */
-  height: 90%; /* Let container/max-height control size */
-  max-width: 100%; /* Prevent overflow */
-  max-height: 90%; /* Max height within the slide */
-  flex-shrink: 0; /* Prevent image from shrinking */
+  display: none;
 }
 
-/* Portrait mode image styles */
-.swiper-slide.is-portrait img {
-  display: block; /* Show the image */
-  max-width: 45%; /* Take up slightly less than half */
-  max-height: 85%; /* Adjust max height for portrait */
-  margin: 0 2%; /* Add some horizontal margin */
-}
-
-/* Landscape mode image styles (if an explicit img tag is used for landscape) */
-/* This class (.is-landscape) is likely added via JS */
-/* If only background-image is used for landscape, this might not be needed */
+/* Landscape mode */
 .swiper-slide.is-landscape img {
-  display: block; /* Show image if present */
+  display: block;
   width: 100%;
   height: 100%;
-  max-width: 100%;
-  max-height: 100%;
-  margin: 0;
-  object-fit: cover; /* Cover might be better for landscape full bleed */
+  object-fit: cover;
 }
 
-/* Caption styles - default/landscape */
+/* ===== PORTRAIT MODE CARD LAYOUT ===== */
+.swiper-slide.is-portrait {
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: clamp(10px, 2vw, 20px);
+}
+
+.portrait-card {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  max-width: 95vw;
+  max-height: 85vh;
+  background: rgba(0, 0, 0, 0.75);
+  border-radius: 15px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  align-items: stretch;
+  min-height: 60vh;
+}
+
+.swiper-slide.is-portrait img {
+  display: block;
+  flex: 0 0 40%;
+  width: 40%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* ===== CAPTION STYLES ===== */
 .caption-wrapper {
   position: absolute;
   bottom: 0;
@@ -122,55 +149,47 @@ body {
   width: 100%;
   z-index: 2;
   padding: 2% 3%;
-  background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 0.95) 0%,
-    rgba(0, 0, 0, 0.9) 15%,
-    rgba(0, 0, 0, 0.85) 30%,
-    rgba(0, 0, 0, 0.75) 50%,
-    rgba(0, 0, 0, 0.6) 70%,
-    rgba(0, 0, 0, 0.3) 85%,
-    rgba(0, 0, 0, 0) 100%
-  );
+  background: var(--gradient-text-protection);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   transition: all 0.3s ease;
-  opacity: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
-/* Caption styles - portrait mode */
 .swiper-slide.is-portrait .caption-wrapper {
-  position: relative; /* Take space in flex layout */
-  bottom: auto;
-  left: auto;
-  width: auto; /* Let content define width */
-  max-width: 50%; /* Take up remaining space next to image */
-  z-index: 1;
-  margin: 0 2%; /* Match image margin */
-  background: rgba(0, 0, 0, 0.75);
-  border-radius: 6px;
-  padding: 15px 20px; /* Increased padding */
-  align-self: center; /* Vertically center */
-  text-align: left; /* Align text left */
-  align-items: flex-start; /* Align items (like text blocks) to start */
-  height: auto; /* Fit content */
-  max-height: 85%; /* Match image max-height roughly */
-  overflow: hidden; /* Hide potential overflow before text clamps */
+  position: static;
+  flex: 1 1 60%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  height: 100%;
+  padding: clamp(15px, 3vw, 30px);
+  background: none;
+  border-radius: 0;
+  margin: 0;
+  max-width: none;
+  align-self: stretch;
+  overflow: hidden;
+  min-height: 0;
 }
 
-/* Caption content styles */
+/* ===== CAPTION CONTENT ===== */
 .swiper-slide-caption {
   color: #fff;
   font-family: 'Noto Sans Display', sans-serif;
   font-weight: bold;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
-  margin-bottom: 10px;
-  width: 100%; /* Full width within caption-wrapper */
+  margin-bottom: clamp(8px, 2vw, 15px);
+  width: 100%;
   text-align: left;
-  /* Responsive font size: min, preferred (viewport width based), max */
-  font-size: clamp(1.2rem, 3vw + 0.5rem, 2.2rem); /* Adjusted clamp */
-  line-height: 1.3;
+  font-size: clamp(1rem, 2.5vw + 0.3rem, 1.8rem);
+  line-height: 1.2;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  flex-shrink: 0;
 }
 
 .swiper-slide-overview {
@@ -178,131 +197,173 @@ body {
   font-family: 'Noto Sans Display', sans-serif;
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
   text-align: left;
-  width: 100%; /* Full width within caption-wrapper */
-  /* Responsive font size: min, preferred (viewport width based), max */
-  font-size: clamp(0.8rem, 1.5vw + 0.5rem, 1.1rem); /* Adjusted clamp */
-  line-height: 1.5;
-  /* Max height based on line height and desired lines */
-  max-height: calc(1.5em * 5); /* Approx 5 lines visible */
+  width: 100%;
+  font-size: clamp(0.75rem, 1.2vw + 0.3rem, 1rem);
+  line-height: 1.4;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
-  padding-right: 8px; /* Space for scrollbar */
+  padding-right: 8px;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
 }
 
-/* Portrait mode text adjustments (already handled by .is-portrait .caption-wrapper) */
-/* Simplified - width is 100% by default now */
-.swiper-slide.is-portrait .swiper-slide-caption {
-  margin-bottom: 8px;
+/* Landscape mode overview height constraint */
+.swiper-slide:not(.is-portrait) .swiper-slide-overview {
+  max-height: calc(1.4em * 4);
+  flex: none;
 }
 
 .swiper-slide.is-portrait .swiper-slide-overview {
-  /* Allow slightly more lines in portrait side-by-side view */
-  max-height: calc(1.5em * 6); /* Approx 6 lines */
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 100%;
 }
 
-/* Scrollbar styling */
+/* ===== SCROLLBAR STYLING ===== */
 .swiper-slide-overview::-webkit-scrollbar {
   width: 5px;
 }
+
 .swiper-slide-overview::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .swiper-slide-overview::-webkit-scrollbar-thumb {
   background-color: rgba(255, 255, 255, 0.4);
   border-radius: 10px;
 }
 
-/* --- Responsive Adjustments --- */
+/* ===== RESPONSIVE BREAKPOINTS ===== */
 
-/* Small devices (phones, portrait and landscape) */
+/* Small devices (phones) */
 @media (max-width: 767px) {
-  .control-buttons {
-    gap: 8px;
-    right: 8px;
-    /* Adjust bottom based on safe area if needed, might be complex with v-bind */
-    bottom: v-bind('showInfoPanel ? "calc(10% + 8px)" : "calc(15px + env(safe-area-inset-bottom))"'); /* Adjust for safe area */
-  }
-  .control-button {
-    padding: 6px 10px;
-    font-size: 0.8rem;
-  }
-
   .info-wrapper {
     padding: 8px 15px;
-    min-height: 8%; /* Slightly reduce min height */
+    min-height: 8%;
     max-height: 12%;
-    /* Consider changing flex-direction to column if content needs stacking */
   }
 
-  .caption-wrapper { /* Landscape on small device */
+  .caption-wrapper {
     padding: 3% 4%;
   }
 
-  .swiper-slide-caption { /* Landscape on small device */
-     font-size: clamp(1.1rem, 4vw + 0.5rem, 1.8rem); /* Smaller max */
-  }
-  .swiper-slide-overview { /* Landscape on small device */
-     font-size: clamp(0.75rem, 2vw + 0.5rem, 1.0rem); /* Smaller max */
-     max-height: calc(1.5em * 4); /* Fewer lines visible */
+  .swiper-slide-caption {
+    font-size: clamp(0.9rem, 3vw + 0.2rem, 1.4rem);
+    line-height: 1.2;
+    margin-bottom: clamp(6px, 1.5vw, 10px);
   }
 
-  /* Portrait on small device */
+  .swiper-slide-overview {
+    font-size: clamp(0.7rem, 2vw + 0.2rem, 0.9rem);
+    line-height: 1.3;
+  }
+
+  .swiper-slide:not(.is-portrait) .swiper-slide-overview {
+    max-height: calc(1.3em * 3);
+  }
+
+  /* Portrait mode on small devices */
   .swiper-slide.is-portrait {
-     /* Stack image and caption vertically on very small screens */
-     flex-direction: column;
-     justify-content: flex-start; /* Align to top */
-     padding-top: 5%; /* Add some padding */
+    padding: 8px;
   }
+
+  .portrait-card {
+    flex-direction: column;
+    max-height: 90vh;
+    max-width: 95vw;
+    min-height: 70vh;
+  }
+  
   .swiper-slide.is-portrait img {
-      max-width: 80%; /* Allow image to be wider when stacked */
-      max-height: 50%; /* Limit image height */
-      margin: 0 0 15px 0; /* Margin below image */
+    width: 100%;
+    height: 50%;
+    flex: 0 0 50%;
+    max-height: 45vh;
+    object-fit: contain;
+    object-position: center;
+    background: rgba(0, 0, 0, 0.2);
   }
+
   .swiper-slide.is-portrait .caption-wrapper {
-      position: relative; /* Keep relative for stacking */
-      max-width: 90%; /* Wider caption when stacked */
-      margin: 0 auto; /* Center horizontally */
-      padding: 10px 15px;
-      max-height: none; /* Remove max-height, let content flow */
-      align-self: stretch; /* Stretch to container width (within max-width) */
-  }
-  .swiper-slide.is-portrait .swiper-slide-caption {
-      font-size: clamp(1.1rem, 4vw + 0.5rem, 1.8rem);
-  }
-  .swiper-slide.is-portrait .swiper-slide-overview {
-       font-size: clamp(0.75rem, 2vw + 0.5rem, 1.0rem);
-       max-height: calc(1.5em * 5); /* Adjust lines for stacked portrait */
+    padding: clamp(12px, 3vw, 18px);
+    flex: 1 1 50%;
+    min-height: 0;
+    max-height: 45vh;
   }
 }
 
-/* Medium devices (tablets, portrait) */
-/* Using orientation + min-width to target tablets specifically */
+/* Medium devices (tablets in portrait) */
 @media (min-width: 768px) and (max-width: 1023px) and (orientation: portrait) {
+  .portrait-card {
+    min-height: 65vh;
+  }
+
   .swiper-slide.is-portrait img {
-    max-width: 40%; /* Adjust image/text ratio for portrait tablets */
+    flex-basis: 42%;
+    width: 42%;
+    object-fit: contain;
+    object-position: center;
+    background: rgba(0, 0, 0, 0.2);
   }
+
   .swiper-slide.is-portrait .caption-wrapper {
-    max-width: 55%;
-    padding: 20px 25px;
+    flex-basis: 58%;
   }
-   .swiper-slide.is-portrait .swiper-slide-caption {
-      font-size: clamp(1.4rem, 2.5vw + 0.7rem, 2.4rem);
+
+  .swiper-slide.is-portrait .swiper-slide-caption {
+    font-size: clamp(1.1rem, 2vw + 0.4rem, 1.8rem);
+    line-height: 1.2;
   }
+
   .swiper-slide.is-portrait .swiper-slide-overview {
-       font-size: clamp(0.9rem, 1.2vw + 0.6rem, 1.2rem);
-       max-height: calc(1.5em * 7); /* More lines on tablet */
+    font-size: clamp(0.8rem, 1.2vw + 0.3rem, 1.1rem);
+    line-height: 1.4;
   }
 }
 
-/* Larger devices (desktops) */
-@media (min-width: 1024px) {
-  /* Optional: Increase base font sizes or spacing slightly for large screens */
-  .swiper-slide-caption { /* Landscape on Desktop */
-     /* Clamp values already handle large sizes, but can fine-tune */
-     font-size: clamp(1.5rem, 3vw + 0.5rem, 2.5rem);
+/* Medium devices (tablets in landscape) */
+@media (min-width: 768px) and (max-width: 1023px) and (orientation: landscape) {
+  .swiper-slide-caption {
+    font-size: clamp(1rem, 2vw + 0.3rem, 1.6rem);
   }
-  .swiper-slide-overview { /* Landscape on Desktop */
-     max-height: calc(1.5em * 6);  /* Allow more lines */
+
+  .swiper-slide-overview {
+    font-size: clamp(0.75rem, 1.2vw + 0.3rem, 1rem);
+  }
+
+  .swiper-slide:not(.is-portrait) .swiper-slide-overview {
+    max-height: calc(1.4em * 4);
+  }
+}
+
+/* Large devices (desktops) */
+@media (min-width: 1024px) {
+  .swiper-slide-caption {
+    font-size: clamp(1.2rem, 2vw + 0.4rem, 2rem);
+    line-height: 1.2;
+  }
+
+  .swiper-slide-overview {
+    font-size: clamp(0.85rem, 1.2vw + 0.3rem, 1.1rem);
+    line-height: 1.4;
+  }
+
+  .swiper-slide:not(.is-portrait) .swiper-slide-overview {
+    max-height: calc(1.4em * 5);
+  }
+
+  .portrait-card {
+    max-width: 90vw;
+    min-height: 60vh;
+  }
+
+  .swiper-slide.is-portrait img {
+    object-fit: contain;
+    object-position: center;
+    background: rgba(0, 0, 0, 0.2);
   }
 }
