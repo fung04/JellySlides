@@ -103,15 +103,34 @@ body {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: cover; 
 }
 
 /* ===== PORTRAIT MODE CARD LAYOUT ===== */
-.swiper-slide.is-portrait {
-  flex-direction: row;
+.swiper-slide.is-audio {
+  flex-direction: column-reverse;
   justify-content: center;
   align-items: center;
   padding: clamp(10px, 2vw, 20px);
+}
+
+.swiper-slide.is-portrait {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: clamp(10px, 2vw, 20px);
+}
+
+.audio-card  {
+  display: flex;
+  flex-direction: column;
+  /* background: rgba(0, 0, 0, 0.75); */
+  border-radius: 15px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  overflow: clip;
+  align-items: center;
+  min-height: 70vh;
+  max-height: 70vh;
 }
 
 .portrait-card {
@@ -126,6 +145,19 @@ body {
   overflow: hidden;
   align-items: stretch;
   min-height: 60vh;
+}
+
+.swiper-slide.is-audio img {
+  display: block;
+  align-self:center;
+  height: 100%;
+  max-height: 70vh;
+  max-width: 70vw;
+  
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .swiper-slide.is-portrait img {
@@ -158,9 +190,21 @@ body {
   overflow: hidden;
 }
 
+.swiper-slide.is-audio .caption-wrapper {
+  position: static;
+  display: flex;
+  align-self: center;
+  width: 80vh;
+  padding: 1% 0%;
+  overflow: hidden; 
+  background: none;
+  border-radius: 0;
+  margin: 0;
+}
+
 .swiper-slide.is-portrait .caption-wrapper {
   position: static;
-  flex: 1 1 60%;
+  flex: 1 1 100%;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -172,7 +216,7 @@ body {
   max-width: none;
   align-self: stretch;
   overflow: hidden;
-  min-height: 0;
+  min-height: 100%;
 }
 
 /* ===== CAPTION CONTENT ===== */
@@ -190,6 +234,11 @@ body {
   overflow-wrap: break-word;
   hyphens: auto;
   flex-shrink: 0;
+}
+
+.swiper-slide.is-audio .swiper-slide-caption {
+  text-align: center;
+  margin-bottom: 0%;
 }
 
 .swiper-slide-overview {
@@ -211,13 +260,17 @@ body {
   scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
 }
 
+.swiper-slide.is-audio .swiper-slide-overview {
+  display: none;
+}
+
 /* Landscape mode overview height constraint */
-.swiper-slide:not(.is-portrait) .swiper-slide-overview {
-  max-height: calc(1.4em * 4);
+.swiper-slide:not(.is-audio) .swiper-slide-overview {
+  max-height: calc(1.4em * 16);
   flex: none;
 }
 
-.swiper-slide.is-portrait .swiper-slide-overview {
+.swiper-slide.is-audio .swiper-slide-overview {
   flex: 1 1 auto;
   min-height: 0;
   max-height: 100%;
@@ -328,11 +381,11 @@ body {
 /* Medium devices (tablets in landscape) */
 @media (min-width: 768px) and (max-width: 1023px) and (orientation: landscape) {
   .swiper-slide-caption {
-    font-size: clamp(1rem, 2vw + 0.3rem, 1.6rem);
+    font-size: clamp(1.5rem, 2vw + 0.3rem, 2rem);
   }
 
   .swiper-slide-overview {
-    font-size: clamp(0.75rem, 1.2vw + 0.3rem, 1rem);
+    font-size: clamp(1rem, 1.2vw + 0.3rem, 1.4rem);
   }
 
   .swiper-slide:not(.is-portrait) .swiper-slide-overview {

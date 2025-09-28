@@ -174,7 +174,7 @@ const performSlideTransition = async (mediaInfo) => {
             console.log(mediaInfo)
             
             if (targetSlide) {
-                await updateSlideLayout(targetSlide, mediaType === "Audio" ? { imageType: "Primary" } : { imageType: "Backdrop" });
+                await updateSlideLayout(targetSlide, mediaType === "Audio" ? { imageType: "Primary", type: "Audio" } : { imageType: "Backdrop" });
                 nextSlideImage.style.display = 'block';
             }
         }
